@@ -1,0 +1,18 @@
+<svg width="5" height="5" viewBox="0 0 5 5" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#filter0_i_1711_13596)">
+<rect width="5" height="5" rx="0.5" fill="#D9D9D9" style="fill:#D9D9D9;fill:color(display-p3 0.8510 0.8510 0.8510);fill-opacity:1;"/>
+</g>
+<rect x="0.1" y="0.1" width="4.8" height="4.8" rx="0.4" stroke="#B74E9E" style="stroke:#B74E9E;stroke:color(display-p3 0.7173 0.3044 0.6179);stroke-opacity:1;" stroke-width="0.2"/>
+<line x1="1" y1="2.75" x2="4" y2="2.75" stroke="#890469" style="stroke:#890469;stroke:color(display-p3 0.5373 0.0157 0.4118);stroke-opacity:1;" stroke-width="0.5"/>
+<defs>
+<filter id="filter0_i_1711_13596" x="0" y="0" width="5" height="5" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dx="-0.5" dy="0.5"/>
+<feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.8 0"/>
+<feBlend mode="normal" in2="shape" result="effect1_innerShadow_1711_13596"/>
+</filter>
+</defs>
+</svg>

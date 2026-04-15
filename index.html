@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QQ Avatar 聊天气泡交互原型</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --font:'PingFang SC','SF Pro Display','Helvetica Neue',sans-serif;
+  --bg:#F2F2F2;
+  --white:#FFFFFF;
+  --black:#000000;
+  --gray-100:#FAFAFA;
+  --gray-200:#F0F0F0;
+  --gray-300:#E5E5E5;
+  --gray-400:#CCCCCC;
+  --gray-500:#999999;
+  --gray-600:#666666;
+  --gray-700:#333333;
+  --gray-800:#1A1A1A;
+  --text-primary:rgba(0,0,0,.88);
+  --text-secondary:rgba(0,0,0,.40);
+  --text-tertiary:rgba(0,0,0,.25);
+  --border:rgba(0,0,0,.06);
+  --shadow-sm:0 1px 3px rgba(0,0,0,.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,.06);
+  --shadow-lg:0 8px 30px rgba(0,0,0,.08);
+}
+html{font-size:16px}
+body{
+  font-family:var(--font);
+  background:var(--gray-200);
+  display:flex;flex-direction:column;align-items:center;
+  min-height:100vh;padding:24px 16px 48px;
+  color:var(--text-primary);overflow-x:hidden;
+}
+
+/* ============ CONTROL BAR ============ */
+.control-bar{
+  position:sticky;top:12px;z-index:100;
+  display:flex;align-items:center;gap:12px;
+  padding:10px 20px;margin-bottom:20px;
+  background:rgba(255,255,255,.72);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-radius:14px;border:1px solid var(--border);
+  box-shadow:var(--shadow-md);
+}
+.control-bar .label{font-size:12px;color:var(--text-secondary);font-weight:500;letter-spacing:.3px}
+.style-toggle{display:flex;background:var(--gray-200);border-radius:8px;padding:2px}
+.style-toggle button{
+  padding:6px 14px;border:none;cursor:pointer;
+  font-size:11px;font-weight:600;font-family:var(--font);
+  color:var(--text-secondary);background:transparent;
+  border-radius:6px;transition:all .25s;
+}
+.style-toggle button.active{
+  background:var(--white);color:var(--gray-800);
+  box-shadow:0 1px 4px rgba(0,0,0,.08);
+}
+.btn-clear{
+  display:flex;align-items:center;gap:5px;
+  padding:6px 14px;border:none;border-radius:8px;cursor:pointer;
+  background:var(--gray-800);
+  color:var(--white);font-size:11px;font-weight:600;font-family:var(--font);
+  transition:all .2s;
+}
+.btn-clear:hover{background:var(--black)}
+.btn-clear:active{transform:scale(.96)}
+.btn-clear svg{width:12px;height:12px}
+
+/* ============ PHONE FRAME ============ */
+.phone-frame{
+  width:428px;height:926px;
+  background:var(--white);border-radius:44px;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.08),
+    0 20px 60px rgba(0,0,0,.10),
+    0 40px 80px rgba(0,0,0,.05);
+  overflow:hidden;display:flex;flex-direction:column;position:relative;
+}
+
+/* ============ STATUS BAR ============ */
+.status-bar{
+  height:44px;display:flex;align-items:flex-end;justify-content:space-between;
+  padding:0 28px 0;flex-shrink:0;position:relative;z-index:40;
+  background:var(--white);
+}
+.status-bar .time{
+  font-size:17px;font-weight:600;font-family:'SF Pro',var(--font);
+  color:var(--black);padding-bottom:8px;
+}
+.status-bar .icons{display:flex;gap:6px;align-items:center;padding-bottom:10px}
+.status-bar .icons img{height:12px}
+
+/* ============ CHAT HEADER ============ */
+.chat-header{
+  height:34px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;border-bottom:.5px solid var(--border);flex-shrink:0;
+  background:var(--white);
+}
+.chat-header .left{display:flex;align-items:center;gap:6px}
+.chat-header .left .back-btn{display:flex;align-items:center;cursor:pointer}
+.chat-header .left .back-btn img{width:12px;height:24px}
+.chat-header .left .badge{
+  font-size:14px;font-weight:500;font-family:'SF Pro Display',var(--font);
+  background:var(--gray-200);border-radius:12px;
+  padding:4px 6px;color:var(--text-primary);min-width:29px;text-align:center;line-height:1;
+}
+.chat-header .title{font-size:17px;font-weight:500;color:var(--text-primary)}
+.chat-header .right img{width:24px;height:24px}
+
+/* ============ MESSAGE LIST ============ */
+.msg-list{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  padding:8px 4px;background:var(--white);
+  display:flex;flex-direction:column;gap:0;
+  scroll-behavior:smooth;
+}
+.msg-list::-webkit-scrollbar{width:0}
+
+/* Empty state */
+.empty-state{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:12px;padding:60px 40px;
+  text-align:center;
+}
+.empty-state .empty-icon{
+  width:80px;height:80px;border-radius:40px;
+  background:var(--gray-200);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.04);
+}
+.empty-state .empty-icon svg{width:32px;height:32px;color:var(--gray-400)}
+.empty-state .empty-title{font-size:15px;font-weight:600;color:var(--gray-700)}
+.empty-state .empty-desc{font-size:12px;color:var(--text-secondary);line-height:1.6}
+
+/* Time label */
+.time-label{
+  text-align:center;padding:10px 0 6px;
+  font-size:11px;color:var(--text-tertiary);font-weight:400;
+  letter-spacing:.3px;
+}
+
+/* ============ MESSAGE ROW ============ */
+.msg-row{
+  display:flex;align-items:flex-end;gap:0;
+  min-height:48px;
+  flex-shrink:0;
+  opacity:0;transform:translateY(12px);
+  transition:opacity .35s ease,transform .35s cubic-bezier(.4,0,.2,1);
+  margin:0;position:relative;
+}
+.msg-row.show{opacity:1;transform:translateY(0)}
+.msg-row.right{flex-direction:row-reverse}
+
+/* ============ AVATAR CHARACTER ============ */
+.avatar-character{
+  width:60px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:flex-end;position:relative;
+  opacity:0;transform:translateY(16px) scale(.9);
+  transition:opacity .35s ease,transform .35s cubic-bezier(.34,1.56,.64,1);
+}
+.avatar-character.show{opacity:1;transform:translateY(10px) scale(1)}
+.avatar-character img{
+  width:90px;height:90px;object-fit:contain;
+}
+/* speaking 状态不再摇晃，保持静止 */
+.avatar-character.speaking img{}
+
+/* Video avatar */
+.avatar-character video{
+  width:82px;height:90px;object-fit:cover;
+  background:var(--white);
+  border-radius:0;
+}
+/* 白底视频混合模式 */
+.avatar-character video.blend-white{
+  mix-blend-mode:multiply;
+}
+@keyframes speak-sway{
+  0%,100%{transform:rotate(0deg) translateY(0)}
+  15%{transform:rotate(-1.5deg) translateY(-1.5px)}
+  50%{transform:rotate(0deg) translateY(-1px)}
+  85%{transform:rotate(1.5deg) translateY(-1.5px)}
+}
+
+/* ============ NORMAL AVATAR ============ */
+.normal-avatar{
+  width:60px;height:90px;flex-shrink:0;
+  display:flex;align-items:flex-end;justify-content:center;
+  margin-left:0;margin-right:0;
+}
+.normal-avatar img{width:40px;height:40px;border-radius:20px;object-fit:cover;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+
+/* ============ BUBBLE WRAP ============ */
+.bubble-wrap{display:flex;flex-direction:column;max-width:260px;position:relative}
+.msg-row.right .bubble-wrap{align-items:flex-end}
+.msg-row.left .bubble-wrap{align-items:flex-start;margin-left:0}
+.msg-row.left .bubble-wrap.no-avatar{margin-left:0}.sender-name{
+  font-size:11px;color:var(--text-secondary);margin-bottom:5px;
+  padding:0 6px;font-weight:500;
+}
+
+/* ============ BUBBLE BASE ============ */
+.bubble{
+  position:relative;padding:9px 14px;
+  font-size:17px;line-height:1.4;letter-spacing:.1px;
+  min-height:42px;
+  word-break:break-all;
+}
+/* Avatar user bubble: 从尖角位置弹出 */
+.msg-row.left .has-avatar .bubble{
+  opacity:0;
+  transform:scale(0);
+  transform-origin:left top;
+}
+.msg-row.right .has-avatar .bubble{
+  opacity:0;
+  transform:scale(0);
+  transform-origin:right top;
+}
+.msg-row.left .has-avatar .bubble.show{
+  opacity:1;transform:scale(1);
+  animation:bubble-pop-left .4s cubic-bezier(.175,.885,.32,1.275);
+}
+.msg-row.right .has-avatar .bubble.show{
+  opacity:1;transform:scale(1);
+  animation:bubble-pop-right .4s cubic-bezier(.175,.885,.32,1.275);
+}
+@keyframes bubble-pop-left{
+  0%{opacity:0;transform:scale(0)}
+  50%{opacity:1;transform:scale(1.12)}
+  75%{transform:scale(0.95)}
+  100%{opacity:1;transform:scale(1)}
+}
+@keyframes bubble-pop-right{
+  0%{opacity:0;transform:scale(0)}
+  50%{opacity:1;transform:scale(1.12)}
+  75%{transform:scale(0.95)}
+  100%{opacity:1;transform:scale(1)}
+}
+/* No-avatar user bubble: simple fade only */
+.no-avatar .bubble{
+  opacity:0;
+  transition:opacity .35s ease;
+}
+.no-avatar .bubble.show{
+  opacity:1;
+}
+
+/* ============ COMIC STYLE (漫画风) ============ */
+[data-style="comic"] .bubble{
+  background:var(--white);
+  border:1px solid var(--gray-800);
+  border-radius:21px;
+  box-shadow:none;
+  color:var(--text-primary);font-size:17px;
+  padding:9px 14px;
+}
+/* 左侧 avatar：30°等腰三角尖角 */
+[data-style="comic"] .msg-row.left .has-avatar .bubble{margin-left:0}
+[data-style="comic"] .msg-row.left .has-avatar .bubble::before{
+  content:'';position:absolute;top:5px;left:-10px;
+  width:0;height:0;
+  border-right:12px solid var(--gray-800);
+  border-top:4px solid transparent;
+  border-bottom:4px solid transparent;
+  transform:rotate(30deg);
+  transform-origin:right center;
+  z-index:2;
+}
+[data-style="comic"] .msg-row.left .has-avatar .bubble::after{
+  content:'';position:absolute;top:6px;left:-8px;
+  width:0;height:0;
+  border-right:11px solid var(--white);
+  border-top:3.5px solid transparent;
+  border-bottom:3.5px solid transparent;
+  transform:rotate(30deg);
+  transform-origin:right center;
+  z-index:3;
+}
+/* 右侧 avatar（我）：30°等腰三角尖角 */
+[data-style="comic"] .msg-row.right .has-avatar .bubble{margin-right:0}
+[data-style="comic"] .msg-row.right .has-avatar .bubble::before{
+  content:'';position:absolute;top:5px;right:-10px;
+  width:0;height:0;
+  border-left:12px solid var(--gray-800);
+  border-top:4px solid transparent;
+  border-bottom:4px solid transparent;
+  transform:rotate(-30deg);
+  transform-origin:left center;
+  z-index:2;
+}
+[data-style="comic"] .msg-row.right .has-avatar .bubble::after{
+  content:'';position:absolute;top:6px;right:-8px;
+  width:0;height:0;
+  border-left:11px solid var(--white);
+  border-top:3.5px solid transparent;
+  border-bottom:3.5px solid transparent;
+  transform:rotate(-30deg);
+  transform-origin:left center;
+  z-index:3;
+}
+/* 蛋黄 */
+[data-style="comic"] .msg-row.left .no-avatar .bubble{
+  background:var(--gray-200);border:none;border-radius:14px;box-shadow:none;
+}
+
+/* ============ MODERN STYLE (现代风) ============ */
+[data-style="modern"] .bubble{
+  background:var(--white);border-radius:21px;
+  box-shadow:var(--shadow-sm);border:none;
+  font-size:15px;color:var(--text-primary);
+}
+[data-style="modern"] .msg-row.right .bubble{
+  background:var(--gray-800);color:var(--white);border-radius:21px;
+}
+/* Modern tail - left side */
+[data-style="modern"] .msg-row.left .has-avatar .bubble::after{
+  content:'';position:absolute;top:14px;left:-4px;
+  width:8px;height:8px;background:var(--white);
+  transform:rotate(45deg);border-radius:1px;
+}
+/* Modern tail - right side */
+[data-style="modern"] .msg-row.right .has-avatar .bubble::after{
+  content:'';position:absolute;top:14px;right:-4px;
+  width:8px;height:8px;background:var(--gray-800);
+  transform:rotate(45deg);border-radius:1px;
+}
+[data-style="modern"] .msg-row.left .no-avatar .bubble{
+  background:var(--gray-200);border-radius:14px;
+}
+
+/* ============ EMOTION: EXCITED ============ */
+[data-style="comic"] .bubble[data-emotion="excited"]{
+  box-shadow:none;
+}
+[data-style="comic"] .has-avatar .bubble[data-emotion="excited"].show{
+  animation:bubble-pop-in .45s cubic-bezier(.175,.885,.32,1.275);
+}
+[data-style="modern"] .bubble[data-emotion="excited"]{
+  box-shadow:0 2px 12px rgba(0,0,0,.08);
+}
+/* Sparkle - 星星和兴奋点点图片 */
+.sparkles{display:none;position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;overflow:visible}
+.bubble[data-emotion="excited"].show .sparkles{display:block}
+.sparkle{
+  position:absolute;
+  width:16px;height:16px;
+  background-size:contain;background-repeat:no-repeat;
+  opacity:0;animation:img-float .8s ease forwards;
+}
+.sparkle:nth-child(1){top:-12px;right:8px;animation-delay:.05s;background-image:url('Star.png');width:14px;height:14px}
+.sparkle:nth-child(2){top:-8px;left:-8px;animation-delay:.2s;background-image:url('兴奋.png');width:12px;height:12px}
+.sparkle:nth-child(3){top:0;right:-14px;animation-delay:.12s;background-image:url('Star.png');width:12px;height:12px}
+@keyframes img-float{
+  0%{opacity:0;transform:scale(0) translateY(0)}
+  40%{opacity:1;transform:scale(1.1) translateY(-3px)}
+  100%{opacity:0;transform:scale(.6) translateY(-12px)}
+}
+@keyframes bubble-pop-in{
+  0%{transform:scale(.3) translateX(-10px);opacity:0}
+  50%{transform:scale(1.05) translateX(2px);opacity:1}
+  70%{transform:scale(.97) translateX(-1px)}
+  100%{transform:scale(1) translateX(0)}
+}
+@keyframes comic-bounce{
+  0%{transform:scale(.4) translateX(-8px)}
+  50%{transform:scale(1.04) translateX(1px)}
+  75%{transform:scale(.98) translateX(0)}
+  100%{transform:scale(1) translateX(0)}
+}
+
+/* ============ EMOTION: ANGRY ============ */
+[data-style="comic"] .bubble[data-emotion="angry"]{
+  box-shadow:none;
+}
+[data-style="comic"] .bubble[data-emotion="angry"].show{animation:shake .45s ease}
+[data-style="modern"] .bubble[data-emotion="angry"]{
+  box-shadow:0 2px 12px rgba(0,0,0,.1);
+}
+.anger-marks{display:none;position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;overflow:visible}
+.bubble[data-emotion="angry"].show .anger-marks{display:block}
+.anger-mark{position:absolute;animation:anger-pop-fade 2s ease forwards}
+/* 大的 */
+.anger-mark:nth-child(1){opacity:0}
+.msg-row.left .anger-mark:nth-child(1){top:-10px;right:-2px}
+.msg-row.right .anger-mark:nth-child(1){top:-10px;left:-2px}
+.anger-mark:nth-child(1) img{width:20px;height:20px}
+/* 小的 */
+.anger-mark:nth-child(2){opacity:0;animation-delay:.15s}
+.msg-row.left .anger-mark:nth-child(2){top:-4px;right:-14px}
+.msg-row.right .anger-mark:nth-child(2){top:-4px;left:-14px}
+.anger-mark:nth-child(2) img{width:12px;height:12px}
+/* 感叹号 */
+.anger-mark:nth-child(3){opacity:0;animation-delay:.25s}
+.msg-row.left .anger-mark:nth-child(3){bottom:-8px;right:-4px;top:auto}
+.msg-row.right .anger-mark:nth-child(3){bottom:-8px;left:-4px;top:auto}
+.anger-mark:nth-child(3) img{width:14px;height:14px}
+@keyframes anger-pop-fade{
+  0%{opacity:0;transform:scale(0) rotate(-20deg)}
+  15%{opacity:1;transform:scale(1.15) rotate(5deg)}
+  25%{opacity:1;transform:scale(1) rotate(0deg)}
+  70%{opacity:1;transform:scale(1) rotate(0deg)}
+  100%{opacity:0;transform:scale(.5) rotate(10deg)}
+}
+@keyframes shake{
+  0%,100%{transform:translateX(0) scale(1)}
+  15%{transform:translateX(-4px) scale(1)}30%{transform:translateX(4px) scale(1)}
+  45%{transform:translateX(-3px) scale(1)}60%{transform:translateX(3px) scale(1)}
+  75%{transform:translateX(-1px) scale(1)}90%{transform:translateX(1px) scale(1)}
+}
+
+/* ============ TYPING CURSOR (隐藏) ============ */
+.typing-cursor{display:none!important}
+
+/* ============ TYPING INDICATOR (dot animation) ============ */
+.typing-indicator{
+  display:flex;align-items:center;gap:3px;
+  padding:12px 16px;
+}
+.typing-indicator .dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--gray-400);
+  animation:typing-dot 1.2s ease-in-out infinite;
+}
+.typing-indicator .dot:nth-child(2){animation-delay:.15s}
+.typing-indicator .dot:nth-child(3){animation-delay:.3s}
+@keyframes typing-dot{
+  0%,60%,100%{transform:translateY(0);opacity:.4}
+  30%{transform:translateY(-4px);opacity:1}
+}
+
+/* ============ INPUT AREA ============ */
+.input-area{
+  flex-shrink:0;background:var(--gray-100);
+  border-top:1px solid var(--border);
+}
+.input-top{
+  display:flex;align-items:center;gap:0;
+  padding:8px 16px;height:56px;
+}
+.input-field-wrap{
+  flex:1;height:40px;background:var(--white);border-radius:20px;
+  display:flex;align-items:center;padding:0 14px;
+  border:1px solid var(--border);
+  transition:border-color .2s;
+}
+.input-field-wrap:focus-within{border-color:rgba(0,0,0,.15)}
+.input-field{
+  flex:1;height:100%;border:none;outline:none;
+  font-size:15px;color:var(--text-primary);
+  font-family:var(--font);background:transparent;
+}
+.input-field::placeholder{color:var(--text-tertiary);font-size:14px}
+.send-btn{
+  width:40px;height:40px;border-radius:20px;border:none;cursor:pointer;
+  background:var(--gray-800);
+  color:var(--white);font-size:16px;font-weight:600;font-family:var(--font);
+  display:flex;align-items:center;justify-content:center;
+  margin-left:8px;transition:all .2s;flex-shrink:0;
+  box-shadow:0 2px 6px rgba(0,0,0,.12);
+}
+.send-btn:hover{background:var(--black);box-shadow:0 3px 10px rgba(0,0,0,.18)}
+.send-btn:active{transform:scale(.94)}
+.send-btn:disabled{background:var(--gray-300);color:var(--gray-500);cursor:not-allowed;transform:none;box-shadow:none}
+.send-btn svg{width:18px;height:18px}
+
+/* Toolbar */
+.input-toolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:2px 32px 4px;height:34px;
+}
+.input-toolbar .toolbar-icon{
+  width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;opacity:.5;transition:opacity .2s;
+}
+.input-toolbar .toolbar-icon:hover{opacity:.8}
+.input-toolbar .toolbar-icon img{width:28px;height:28px}
+
+/* ============ HOME INDICATOR ============ */
+.home-indicator{
+  height:34px;display:flex;align-items:center;justify-content:center;
+  background:var(--gray-100);flex-shrink:0;
+}
+.home-indicator span{width:134px;height:5px;border-radius:3px;background:var(--black);opacity:.12}
+
+/* ============ HINT ============ */
+.hint{color:var(--text-tertiary);font-size:11px;margin-top:16px;text-align:center;letter-spacing:.3px}
+</style>
+</head>
+
+<body data-style="comic">
+
+<!-- ============ PHONE FRAME ============ -->
+<div class="phone-frame">
+
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div class="icons">
+      <img src="assets/CodeBuddyAssets/1711_13089/10.svg" alt="">
+      <img src="assets/CodeBuddyAssets/1711_13089/9.svg" alt="">
+      <img src="assets/CodeBuddyAssets/1711_13089/8.svg" alt="">
+    </div>
+  </div>
+
+  <div class="chat-header">
+    <div class="left">
+      <div class="back-btn">
+        <img src="assets/CodeBuddyAssets/1711_13089/11.svg" alt="back">
+      </div>
+      <span class="badge">57</span>
+    </div>
+    <span class="title">企鹅中学(12)</span>
+    <div class="right">
+      <img src="assets/CodeBuddyAssets/1711_13089/12.svg" alt="menu">
+    </div>
+  </div>
+
+  <!-- ============ MESSAGE LIST ============ -->
+  <div class="msg-list" id="msgList">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+        </svg>
+      </div>
+      <div class="empty-title">发送一条消息试试</div>
+      <div class="empty-desc">输入文字发送后，群成员会回应你<br>有 Avatar 的角色会有说话动画和打字机效果</div>
+    </div>
+  </div>
+
+  <!-- ============ INPUT AREA ============ -->
+  <div class="input-area">
+    <div class="input-top">
+      <div class="input-field-wrap">
+        <input class="input-field" id="inputField" placeholder="说点什么..." maxlength="100" autocomplete="off">
+      </div>
+      <button class="send-btn" id="sendBtn" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+    <div class="input-toolbar">
+      <div class="toolbar-icon"><img src="assets/CodeBuddyAssets/1711_13089/2.svg" alt=""></div>
+      <div class="toolbar-icon"><img src="assets/CodeBuddyAssets/1711_13089/3.svg" alt=""></div>
+      <div class="toolbar-icon"><img src="assets/CodeBuddyAssets/1711_13089/4.svg" alt=""></div>
+      <div class="toolbar-icon"><img src="assets/CodeBuddyAssets/1711_13089/5.svg" alt=""></div>
+      <div class="toolbar-icon"><img src="assets/CodeBuddyAssets/1711_13089/6.svg" alt=""></div>
+      <div class="toolbar-icon"><img src="assets/CodeBuddyAssets/1711_13089/7.svg" alt="" style="transform:rotate(-90deg)"></div>
+    </div>
+  </div>
+
+  <div class="home-indicator"><span></span></div>
+</div>
+
+<p class="hint">QQ Avatar 聊天气泡交互原型</p>
+<button class="btn-clear" id="btnClear" style="margin-top:10px">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14"/></svg>
+  清空对话
+</button>
+
+<!-- ============ JAVASCRIPT ============ -->
+<script>
+(function(){
+  'use strict';
+
+  const CHAR_SPEED = 50;
+  const BUBBLE_DELAY = 250;
+
+  const msgList = document.getElementById('msgList');
+  const inputField = document.getElementById('inputField');
+  const sendBtn = document.getElementById('sendBtn');
+  const emptyState = document.getElementById('emptyState');
+
+  let msgCounter = 0;
+  let timeouts = [];
+
+  function addTimeout(fn, ms) {
+    const t = setTimeout(fn, ms);
+    timeouts.push(t);
+    return t;
+  }
+
+  /* ============ 角色定义 ============ */
+  const SELF = {
+    name: '古风沙拉酱',
+    avatar: '古风_00000_iSpt.png',
+    hasAvatar: true,
+    side: 'right',
+    voice: { voiceName: 'zh-CN-YunxiNeural', rate: '-5%', pitch: '-2Hz' }
+  };
+
+  const MEMBERS = [
+    {
+      name: 'Peko',
+      avatar: '街头_00000_iSpt.png',
+      avatar2: '街头_00000_iSpt.png',
+      hasAvatar: true,
+      side: 'left',
+      personality: 'cool-guy',
+      voice: { voiceName: 'zh-CN-YunyangNeural', rate: '+0%', pitch: '+0Hz' },
+      responses: {
+        excited: [
+          '走啊 这波必须冲！',
+          '稳了稳了 安排上！',
+          '可以啊 有点东西',
+          '爽 直接起飞！',
+          '这波我先到 你们跟上',
+          '带你们玩个大的',
+        ],
+        angry: [
+          '离谱 真的离谱',
+          '搞什么啊 烦死了',
+          '行吧 不想说了',
+          '这谁顶得住啊',
+          '算了 懒得理了',
+        ],
+        neutral: [
+          '行 没问题',
+          '可以 随时',
+          '嗯 收到',
+          '了解',
+          'ok 就这样',
+          '稳',
+          '都行 你们定',
+        ]
+      }
+    },
+    {
+      name: '蛋黄',
+      avatar: '头像.png',
+      hasAvatar: false,
+      side: 'left',
+      personality: 'chill',
+      voice: null,
+      responses: {
+        excited: [
+          '加我加我！',
+          '我也想去来着~',
+          '+1+1',
+          '算我一个',
+          '好耶',
+        ],
+        angry: [
+          '冷静冷静...',
+          '别气了别气了',
+          '消消气吧',
+          '深呼吸深呼吸',
+        ],
+        neutral: [
+          '加我一个加我一个',
+          '确实',
+          '哈哈',
+          '+1',
+          '好',
+          '了解',
+          '行吧',
+          'ok',
+        ]
+      }
+    },
+    {
+      name: '杏仁',
+      avatar: '原神_00000_iSpt.png',
+      hasAvatar: true,
+      side: 'left',
+      personality: 'cool',
+      voice: { voiceName: 'zh-CN-XiaoyiNeural', rate: '+0%', pitch: '+2Hz' },
+      responses: {
+        excited: [
+          '哇塞太棒了叭！(≧∇≦)/',
+          '走走走 姐妹冲！',
+          '同去同去～刚好想出去浪',
+          'nice！这波可以的～',
+          '啊啊啊 期待期待！♡',
+          '有点上头了嘻嘻(¬‿¬)',
+        ],
+        angry: [
+          '这也太离谱了吧(¬_¬)',
+          '确实挺过分的...烦死了',
+          '无语子ᕙ(⇀‸↼‶)ᕗ',
+          '谁啊这是 气死姐了！',
+          '哼 本姑娘的怒火到达顶点了',
+        ],
+        neutral: [
+          '+1+1',
+          '了解了～',
+          '收到收到',
+          '行叭~',
+          '随便啦 都可以的',
+          '好吧好吧(´-ω-`)',
+          '嗯 就这样吧',
+        ]
+      }
+    },
+    {
+      name: 'Coco',
+      avatar: '甜美_00000_iSpt.png',
+      hasAvatar: true,
+      side: 'left',
+      personality: 'sweet',
+      voice: { voiceName: 'zh-CN-XiaoxiaoNeural', rate: '+5%', pitch: '+3Hz' },
+      responses: {
+        excited: [
+          '天哪太开心了吧！(ノ◕ヮ◕)ノ*:・✧',
+          '呜呜呜好棒好棒！！♡',
+          '冲鸭！！本甜妹来也~',
+          '啊啊啊我要疯了太喜欢了(๑°o°๑)',
+          '好耶好耶！一起冲！✨',
+        ],
+        angry: [
+          '哼！气死人了啦(｡•́︿•̀｡)',
+          '讨厌讨厌讨厌！！',
+          '不理你们了哼(╥_╥)',
+          '过分！本小姐生气了！',
+        ],
+        neutral: [
+          '嗯嗯好哒~(◕ᴗ◕✿)',
+          '收到收到♪',
+          '了解啦~',
+          '好嘞好嘞',
+          '嘻嘻 知道了',
+          'okok~',
+        ]
+      }
+    }
+  ];
+
+  /* ============ 情绪检测 ============ */
+  function detectEmotion(text) {
+    const excitedWords = ['哈哈','太好了','冲冲冲','开心','好棒','太棒','耶','！！','!!','awsl','绝了','好耶','万岁','啦啦啦','666','nice','好开心','激动','兴奋','爱了','哇','想去','一起','出发','走起','期待'];
+    const angryWords = ['生气','愤怒','气死','烦死','讨厌','可恶','混蛋','去你的','滚','怒','火大','不爽','靠','我擦','无语','离谱','过分','烦','恶心','讨厌'];
+    const lowerText = text.toLowerCase();
+    for (const w of angryWords) { if (lowerText.includes(w)) return 'angry'; }
+    for (const w of excitedWords) { if (lowerText.includes(w)) return 'excited'; }
+    return 'neutral';
+  }
+
+  /* ============ TTS 语音播放（Edge TTS 云端） ============ */
+  let currentAudio = null;
+
+  function speakText(text, voiceConfig) {
+    if (!voiceConfig || !voiceConfig.voiceName) return;
+
+    /* 清理颜文字 */
+    const cleanText = text
+      .replace(/[\(（][^\)）]*[\)）][ノゞ♪♡~～シ]*/g, '')
+      .replace(/[✨⭐💫✦♡✧★☆♪·:]/g, '')
+      .replace(/[+]+/g, '加')
+      .replace(/[^\u4e00-\u9fa5a-zA-Z0-9，。！？、～~\s]/g, '')
+      .trim();
+    if (!cleanText || cleanText.length < 2) return;
+
+    /* 停止上一条语音 */
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio = null;
+    }
+
+    /* TTS 服务器地址：部署后改为 Render 地址 */
+    const TTS_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:8766'
+      : 'https://edge-tts-server.onrender.com';
+    const voice = encodeURIComponent(voiceConfig.voiceName);
+    const encoded = encodeURIComponent(cleanText);
+    const rate = encodeURIComponent(voiceConfig.rate || '+0%');
+    const pitch = encodeURIComponent(voiceConfig.pitch || '+0Hz');
+    const url = `${TTS_BASE}/tts?voice=${voice}&text=${encoded}&rate=${rate}&pitch=${pitch}`;
+
+    const audio = new Audio(url);
+    audio.volume = 0.85;
+    currentAudio = audio;
+    audio.play().catch(() => {
+      /* 如果云端失败，回退到浏览器 TTS */
+      if (window.speechSynthesis) {
+        const utter = new SpeechSynthesisUtterance(cleanText);
+        utter.lang = 'zh-CN';
+        utter.rate = 1;
+        utter.pitch = 1;
+        window.speechSynthesis.speak(utter);
+      }
+    });
+  }
+
+  /* ============ 打字机效果 ============ */
+  function typeWriter(el, text, callback) {
+    const textSpan = el.querySelector('.bubble-text');
+    const cursor = el.querySelector('.typing-cursor');
+    textSpan.textContent = '';
+    if (cursor) cursor.style.display = 'inline-block';
+
+    let i = 0;
+    function typeNext() {
+      if (i >= text.length) {
+        if (cursor) cursor.style.display = 'none';
+        if (callback) callback();
+        return;
+      }
+      let chunk = text[i];
+      if (text[i] === '(' || text[i] === '（') {
+        const close1 = text.indexOf(')', i);
+        const close2 = text.indexOf('）', i);
+        let closeAt = -1;
+        if (close1 > -1 && close2 > -1) closeAt = Math.min(close1, close2);
+        else if (close1 > -1) closeAt = close1;
+        else if (close2 > -1) closeAt = close2;
+        if (closeAt > i) {
+          let end = closeAt + 1;
+          while (end < text.length && /[ノゞ♪♡~～！!\u{1F600}-\u{1F64F}シ]/u.test(text[end])) end++;
+          chunk = text.substring(i, end);
+          i = end;
+        } else { i++; }
+      }
+      else if (/[！!？?。，、…~]/.test(text[i])) {
+        let end = i + 1;
+        while (end < text.length && /[！!？?。，、…~]/.test(text[end])) end++;
+        chunk = text.substring(i, end);
+        i = end;
+      }
+      else { i++; }
+      textSpan.textContent += chunk;
+      msgList.scrollTop = msgList.scrollHeight;
+      addTimeout(typeNext, CHAR_SPEED);
+    }
+    typeNext();
+  }
+
+  /* ============ 渐显效果（蛋黄用） ============ */
+  function fadeInText(el, text, callback) {
+    const textSpan = el.querySelector('.bubble-text');
+    textSpan.textContent = text;
+    textSpan.style.opacity = '0';
+    textSpan.style.transition = 'opacity .35s ease';
+    requestAnimationFrame(() => { textSpan.style.opacity = '1'; });
+    addTimeout(() => { if (callback) callback(); }, 400);
+  }
+
+  /* ============ 创建消息 DOM ============ */
+  function createMessageEl(member, text, emotion, side) {
+    msgCounter++;
+    const id = 'msg-' + msgCounter;
+    const bubbleId = 'bubble-' + msgCounter;
+    const avatarId = 'avatar-' + msgCounter;
+
+    const row = document.createElement('div');
+    row.className = 'msg-row ' + side;
+    row.id = id;
+
+    let sparklesHTML = '';
+    let angerHTML = '';
+    if (emotion === 'excited') {
+      sparklesHTML = '<div class="sparkles"><span class="sparkle"></span><span class="sparkle"></span><span class="sparkle"></span></div>';
+    } else if (emotion === 'angry') {
+      angerHTML = '<div class="anger-marks"><span class="anger-mark"><img src="愤怒.png" alt=""></span><span class="anger-mark"><img src="愤怒.png" alt=""></span><span class="anger-mark"><img src="生气感叹号.png" alt=""></span></div>';
+    }
+
+    const nameAlign = side === 'right' ? 'text-align:right' : '';
+
+    if (member.hasAvatar) {
+      const avatarImg = (emotion === 'angry' && member.avatar2) ? member.avatar2 : member.avatar;
+      const hasVideo = !!member.video;
+      let avatarContent;
+      if (hasVideo) {
+        avatarContent = `<video src="${member.video}" muted autoplay loop playsinline preload="auto" class="blend-white"></video>`;
+      } else {
+        avatarContent = `<img src="${avatarImg}" alt="${member.name}">`;
+      }
+      row.innerHTML = `
+        <div class="avatar-character" id="${avatarId}" ${hasVideo ? 'data-has-video="true"' : ''}>
+          ${avatarContent}
+        </div>
+        <div class="bubble-wrap has-avatar">
+          <span class="sender-name" style="${nameAlign}">${member.name}</span>
+          <div class="bubble" data-emotion="${emotion}" id="${bubbleId}">
+            <span class="bubble-text"></span><span class="typing-cursor" style="display:none"></span>
+            ${sparklesHTML}${angerHTML}
+          </div>
+        </div>
+      `;
+    } else {
+      row.innerHTML = `
+        <div class="normal-avatar">
+          <img src="${member.avatar}" alt="${member.name}">
+        </div>
+        <div class="bubble-wrap no-avatar">
+          <span class="sender-name">${member.name}</span>
+          <div class="bubble" data-emotion="neutral" id="${bubbleId}">
+            <span class="bubble-text"></span>
+          </div>
+        </div>
+      `;
+    }
+
+    return { row, bubbleId, avatarId, hasAvatar: member.hasAvatar, text, voice: member.voice };
+  }
+
+  /* ============ 动画播放单条消息 ============ */
+  function animateMessage(msgData, callback) {
+    const { row, bubbleId, avatarId, hasAvatar, text, voice } = msgData;
+
+    msgList.appendChild(row);
+    if (emptyState) emptyState.style.display = 'none';
+
+    requestAnimationFrame(() => {
+      row.classList.add('show');
+      msgList.scrollTop = msgList.scrollHeight;
+
+      if (hasAvatar) {
+        const avatar = document.getElementById(avatarId);
+        const videoEl = avatar ? avatar.querySelector('video') : null;
+        /* 确保视频能播放 */
+        if (videoEl) {
+          videoEl.play().catch(() => {});
+        }
+        addTimeout(() => {
+          avatar.classList.add('show');
+          addTimeout(() => {
+            avatar.classList.add('speaking');
+            addTimeout(() => {
+              const bubble = document.getElementById(bubbleId);
+              bubble.classList.add('show');
+              speakText(text, voice);
+              addTimeout(() => {
+                typeWriter(bubble, text, () => {
+                  avatar.classList.remove('speaking');
+                  msgList.scrollTop = msgList.scrollHeight;
+                  if (callback) callback();
+                });
+              }, 120);
+            }, BUBBLE_DELAY);
+          }, 150);
+        }, 40);
+      } else {
+        /* 无 avatar：气泡渐显，文字直接显示 */
+        addTimeout(() => {
+          const bubble = document.getElementById(bubbleId);
+          bubble.classList.add('show');
+          speakText(text, voice);
+          addTimeout(() => {
+            fadeInText(bubble, text, () => {
+              msgList.scrollTop = msgList.scrollHeight;
+              if (callback) callback();
+            });
+          }, 80);
+        }, 200);
+      }
+    });
+  }
+
+  /* ============ 群成员回复逻辑（上下文关联） ============ */
+
+  /* 话题关键词 → 关联回复 */
+  const TOPIC_REPLIES = {
+    '吃|饭|火锅|烧烤|奶茶|麻辣|美食|饿|午饭|晚饭|外卖|炸鸡|蛋糕': {
+      'cool-guy': ['吃啥 我请', '火锅走起 我知道一家巨好吃的', '奶茶帮我带一杯 谢谢'],
+      'chill': ['我也饿了', '吃什么呀', '带我一个', '外卖到了叫我'],
+      'cool': ['走啊 刚好没吃呢～', '啊我也想吃！你推荐啥', '奶茶！我要喝！'],
+      'sweet': ['天哪我也超想吃的！(ﾉ´ヮ`)ﾉ', '一起一起！我要奶茶！♡', '好饿好饿 快冲！'],
+    },
+    '玩|游戏|王者|吃鸡|原神|联机|开黑|上分|段位|排位': {
+      'cool-guy': ['来 开一把', '我段位掉了 带我上分', '今晚开黑吗'],
+      'chill': ['来了来了', '等我五分钟', '我也要玩', '开！'],
+      'cool': ['好呀好呀 等我登录～', '我来我来！打什么', '一起一起 我超强的！'],
+      'sweet': ['我也要！等等我！(≧▽≦)', '带我带我～虽然我菜', '开开开！♡'],
+    },
+    '出去|出发|旅游|玩|去哪|周末|假期|放假|镰仓|海边|爬山|露营|音乐节': {
+      'cool-guy': ['走 说走就走', '我车都准备好了', '这波必须去 不接受反驳', '目的地发一下'],
+      'chill': ['去哪呀', '我也想出去玩', '算我一个吧', '好耶 出发'],
+      'cool': ['啊啊啊一起去！我要拍照！', '冲冲冲～收拾行李了', '去去去！好期待！'],
+      'sweet': ['天哪我超想去的！✨', '一起一起！拍美照！(ﾉ◕ヮ◕)ﾉ', '好棒！我要去！♡'],
+    },
+    '考试|作业|上课|老师|学校|期末|及格|挂科|论文|复习|成绩': {
+      'cool-guy': ['稳的 我抄你的', '别提了 头大', '考完请你们吃饭', '无所谓 反正都是命'],
+      'chill': ['我还没开始复习', '完了完了', '互相抄吧', '别说了别说了'],
+      'cool': ['我也没复习呜呜～', '谁能救救我的成绩', '考试什么的最讨厌了(╥_╥)'],
+      'sweet': ['啊啊啊我也没复习！！', '一起图书馆吧互相监督(•̀ᴗ•́)و', '加油加油 我们可以的！'],
+    },
+    '好看|帅|美|漂亮|可爱|穿搭|衣服|拍照|自拍|滤镜': {
+      'cool-guy': ['谢谢 我知道', '低调低调', '天生的 没办法'],
+      'chill': ['确实好看', '不错不错', '拍得好'],
+      'cool': ['真的吗 我也觉得！嘻嘻', '好好看啊～教教我', '在哪拍的呀 我也想去！'],
+      'sweet': ['天哪也太好看了叭！♡', '绝了绝了 好会拍！✨', '我也想要同款！(≧∇≦)/'],
+    },
+    '无聊|没意思|干嘛|干啥|做什么|好闷': {
+      'cool-guy': ['出来滑板', '走 带你飞', '打游戏不'],
+      'chill': ['我也无聊', '看视频吧', '睡觉？', '刷手机'],
+      'cool': ['我也是～要不出去逛逛？', '找点事做叭 一起', '无聊就来找我玩呀～'],
+      'sweet': ['一起聊天呀！我有八卦！', '要不要视频通话(◕ᴗ◕✿)', '我也无聊 陪你！'],
+    },
+  };
+
+  function generateReplies(userText) {
+    const emotion = detectEmotion(userText);
+    const shuffled = [...MEMBERS].sort(() => Math.random() - 0.5);
+    const replyCount = Math.random() < 0.25 ? 1 : (Math.random() < 0.55 ? 2 : Math.min(3, MEMBERS.length));
+    const repliers = shuffled.slice(0, replyCount);
+
+    const replies = [];
+    for (const member of repliers) {
+      let text = '';
+      let replyEmotion = emotion;
+
+      /* 先尝试话题匹配 */
+      let matched = false;
+      for (const [pattern, roleReplies] of Object.entries(TOPIC_REPLIES)) {
+        const regex = new RegExp(pattern);
+        if (regex.test(userText)) {
+          const pool = roleReplies[member.personality];
+          if (pool && pool.length) {
+            text = pool[Math.floor(Math.random() * pool.length)];
+            matched = true;
+            break;
+          }
+        }
+      }
+
+      /* 没匹配到话题就用情绪回复 */
+      if (!matched) {
+        const pool = member.responses[emotion] || member.responses.neutral;
+        text = pool[Math.floor(Math.random() * pool.length)];
+      }
+
+      if (member.personality === 'chill' && Math.random() < 0.5) replyEmotion = 'neutral';
+      if (member.personality === 'cool' && Math.random() < 0.4) replyEmotion = 'neutral';
+      replies.push({ member, text, emotion: replyEmotion });
+    }
+
+    return replies;
+  }
+
+  /* 显示 typing indicator */
+  function showTypingIndicator(member) {
+    const row = document.createElement('div');
+    row.className = 'msg-row left show';
+    row.id = 'typing-indicator';
+
+    if (member.hasAvatar) {
+      let avatarEl;
+      if (member.video) {
+        avatarEl = `<video src="${member.video}" muted autoplay loop playsinline preload="auto" class="blend-white"></video>`;
+      } else {
+        avatarEl = `<img src="${member.avatar}" alt="${member.name}">`;
+      }
+      row.innerHTML = `
+        <div class="avatar-character show">
+          ${avatarEl}
+        </div>
+        <div class="bubble-wrap has-avatar">
+          <span class="sender-name">${member.name}</span>
+          <div class="bubble show" style="opacity:1;transform:scale(1)">
+            <div class="typing-indicator">
+              <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      row.innerHTML = `
+        <div class="normal-avatar">
+          <img src="${member.avatar}" alt="${member.name}">
+        </div>
+        <div class="bubble-wrap no-avatar">
+          <span class="sender-name">${member.name}</span>
+          <div class="bubble show" style="opacity:1;transform:scale(1)">
+            <div class="typing-indicator">
+              <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    msgList.appendChild(row);
+    msgList.scrollTop = msgList.scrollHeight;
+    return row;
+  }
+
+  function removeTypingIndicator() {
+    const el = document.getElementById('typing-indicator');
+    if (el) el.remove();
+  }
+
+  /* 依次播放回复 */
+  function playReplies(replies, idx) {
+    if (idx >= replies.length) return;
+
+    const { member, text, emotion } = replies[idx];
+    const msgData = createMessageEl(member, text, emotion, 'left');
+    animateMessage(msgData, () => {
+      addTimeout(() => playReplies(replies, idx + 1), 400 + Math.random() * 600);
+    });
+  }
+
+  /* ============ 发送消息 ============ */
+  function sendMessage() {
+    const text = inputField.value.trim();
+    if (!text) return;
+
+    const emotion = detectEmotion(text);
+    const msgData = createMessageEl(SELF, text, emotion, 'right');
+
+    inputField.value = '';
+    sendBtn.disabled = true;
+
+    animateMessage(msgData, () => {
+      /* 延迟后触发群成员回复 */
+      const delay = 800 + Math.random() * 1200;
+      addTimeout(() => {
+        const replies = generateReplies(text);
+        playReplies(replies, 0);
+      }, delay);
+    });
+  }
+
+  /* ============ 输入事件 ============ */
+  inputField.addEventListener('input', () => {
+    sendBtn.disabled = inputField.value.trim().length === 0;
+  });
+
+  inputField.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.isComposing && inputField.value.trim()) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  /* 处理中文输入法 */
+  let isComposing = false;
+  inputField.addEventListener('compositionstart', () => { isComposing = true; });
+  inputField.addEventListener('compositionend', () => {
+    isComposing = false;
+    sendBtn.disabled = inputField.value.trim().length === 0;
+  });
+
+  sendBtn.addEventListener('click', () => {
+    if (inputField.value.trim()) sendMessage();
+  });
+
+  /* ============ 清空对话 ============ */
+  document.getElementById('btnClear').addEventListener('click', () => {
+    timeouts.forEach(t => clearTimeout(t));
+    timeouts = [];
+    msgList.innerHTML = '';
+    msgCounter = 0;
+    const es = document.createElement('div');
+    es.className = 'empty-state';
+    es.id = 'emptyState';
+    es.innerHTML = `
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+        </svg>
+      </div>
+      <div class="empty-title">发送一条消息试试</div>
+      <div class="empty-desc">输入文字发送后，群成员会回应你<br>有 Avatar 的角色会有说话动画和打字机效果</div>
+    `;
+    msgList.appendChild(es);
+  });
+
+})();
+</script>
+
+</body>
+</html>

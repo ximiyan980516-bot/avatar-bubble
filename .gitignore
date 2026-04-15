@@ -1,0 +1,7 @@
+.DS_Store
+__pycache__
+*.pyc
+/tts-server/
+tts_server.py
+*.mp4
+.codebuddy/
