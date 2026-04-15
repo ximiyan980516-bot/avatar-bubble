@@ -761,7 +761,7 @@ body{
     /* TTS 服务器地址：部署后改为 Render 地址 */
     const TTS_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
       ? 'http://localhost:8766'
-      : 'https://edge-tts-server.onrender.com';
+      : 'https://edge-tts-server-mu.vercel.app';
     const voice = encodeURIComponent(voiceConfig.voiceName);
     const encoded = encodeURIComponent(cleanText);
     const rate = encodeURIComponent(voiceConfig.rate || '+0%');
