@@ -758,7 +758,7 @@ body{
       currentAudio = null;
     }
 
-    /* TTS 服务器地址：部署后改为 Render 地址 */
+    /* TTS 服务器地址 */
     const TTS_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
       ? 'http://localhost:8766'
       : 'https://edge-tts-server-mu.vercel.app';
@@ -768,17 +768,36 @@ body{
     const pitch = encodeURIComponent(voiceConfig.pitch || '+0Hz');
     const url = `${TTS_BASE}/tts?voice=${voice}&text=${encoded}&rate=${rate}&pitch=${pitch}`;
 
-    const audio = new Audio(url);
-    audio.volume = 0.85;
-    currentAudio = audio;
-    audio.play().catch(() => {
-      /* 如果云端失败，回退到浏览器 TTS */
-      if (window.speechSynthesis) {
-        const utter = new SpeechSynthesisUtterance(cleanText);
-        utter.lang = 'zh-CN';
-        utter.rate = 1;
-        utter.pitch = 1;
-        window.speechSynthesis.speak(utter);
+    /* 用 fetch + AudioContext 播放，兼容微信 */
+    fetch(url)
+      .then(res => {
+        if (!res.ok) throw new Error('TTS fetch failed');
+        return res.arrayBuffer();
+      })
+      .then(buf => {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        return ctx.decodeAudioData(buf).then(decoded => {
+          const source = ctx.createBufferSource();
+          source.buffer = decoded;
+          const gain = ctx.createGain();
+          gain.gain.value = 0.85;
+          source.connect(gain);
+          gain.connect(ctx.destination);
+          if (currentAudio && currentAudio.stop) {
+            try { currentAudio.stop(); } catch(e) {}
+          }
+          currentAudio = source;
+          source.start(0);
+        });
+      })
+      .catch(() => {
+        /* 最终回退：浏览器 TTS */
+        if (window.speechSynthesis) {
+          const utter = new SpeechSynthesisUtterance(cleanText);
+          utter.lang = 'zh-CN';
+          utter.rate = 1;
+          utter.pitch = 1;
+          window.speechSynthesis.speak(utter);
       }
     });
   }
@@ -1114,6 +1133,21 @@ body{
   }
 
   /* ============ 输入事件 ============ */
+  /* 预初始化 AudioContext（微信要求用户交互后才能播放） */
+  let audioCtxUnlocked = false;
+  function unlockAudio() {
+    if (audioCtxUnlocked) return;
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const buf = ctx.createBuffer(1, 1, 22050);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.connect(ctx.destination);
+    src.start(0);
+    audioCtxUnlocked = true;
+  }
+  document.addEventListener('touchstart', unlockAudio, { once: true });
+  document.addEventListener('click', unlockAudio, { once: true });
+
   inputField.addEventListener('input', () => {
     sendBtn.disabled = inputField.value.trim().length === 0;
   });
