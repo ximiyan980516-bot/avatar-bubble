@@ -573,6 +573,13 @@ body{
 
 <!-- ============ JAVASCRIPT ============ -->
 <script>
+/* 全局错误捕获 */
+window.onerror = function(msg, url, line, col, err) {
+  console.error('[GLOBAL ERROR]', msg, 'at line', line, err);
+};
+window.addEventListener('unhandledrejection', function(e) {
+  console.error('[Unhandled Promise]', e.reason);
+});
 (function(){
   'use strict';
 
@@ -765,14 +772,15 @@ body{
 
     /* 停止上一条语音 */
     if (currentAudio) {
-      currentAudio.pause();
+      try {
+        if (typeof currentAudio.pause === 'function') currentAudio.pause();
+        else if (typeof currentAudio.stop === 'function') currentAudio.stop();
+      } catch(e) {}
       currentAudio = null;
     }
 
-    /* TTS 服务器地址 */
-    const TTS_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-      ? 'http://localhost:8766'
-      : 'https://edge-tts-server-mu.vercel.app';
+    /* TTS 服务器地址：统一使用云端 Edge TTS */
+    const TTS_BASE = 'https://edge-tts-server-mu.vercel.app';
     const voice = encodeURIComponent(voiceConfig.voiceName);
     const encoded = encodeURIComponent(cleanText);
     const rate = encodeURIComponent(voiceConfig.rate || '+0%');
@@ -815,41 +823,60 @@ body{
 
   /* ============ 打字机效果 ============ */
   function typeWriter(el, text, callback) {
+    if (!el || !text) { if (callback) callback(); return; }
     const textSpan = el.querySelector('.bubble-text');
+    if (!textSpan) {
+      /* 找不到 .bubble-text，直接把文本写进 el */
+      el.textContent = text;
+      if (callback) callback();
+      return;
+    }
     const cursor = el.querySelector('.typing-cursor');
     textSpan.textContent = '';
     if (cursor) cursor.style.display = 'inline-block';
 
-    let i = 0;
-    function typeNext() {
-      if (i >= text.length) {
-        if (cursor) cursor.style.display = 'none';
-        if (callback) callback();
-        return;
-      }
-      let chunk = text[i];
-      if (text[i] === '(' || text[i] === '（') {
-        const close1 = text.indexOf(')', i);
-        const close2 = text.indexOf('）', i);
+    /* 预分割文本为 chunk 数组 */
+    const chunks = [];
+    let j = 0;
+    while (j < text.length) {
+      if (text[j] === '(' || text[j] === '（') {
+        const close1 = text.indexOf(')', j);
+        const close2 = text.indexOf('）', j);
         let closeAt = -1;
         if (close1 > -1 && close2 > -1) closeAt = Math.min(close1, close2);
         else if (close1 > -1) closeAt = close1;
         else if (close2 > -1) closeAt = close2;
-        if (closeAt > i) {
+        if (closeAt > j) {
           let end = closeAt + 1;
           while (end < text.length && /[ノゞ♪♡~～！!\u{1F600}-\u{1F64F}シ]/u.test(text[end])) end++;
-          chunk = text.substring(i, end);
-          i = end;
-        } else { i++; }
-      }
-      else if (/[！!？?。，、…~]/.test(text[i])) {
-        let end = i + 1;
+          chunks.push(text.substring(j, end));
+          j = end;
+        } else {
+          chunks.push(text[j]);
+          j++;
+        }
+      } else if (/[！!？?。，、…~]/.test(text[j])) {
+        let end = j + 1;
         while (end < text.length && /[！!？?。，、…~]/.test(text[end])) end++;
-        chunk = text.substring(i, end);
-        i = end;
+        chunks.push(text.substring(j, end));
+        j = end;
+      } else {
+        chunks.push(text[j]);
+        j++;
       }
-      else { i++; }
-      textSpan.textContent += chunk;
+    }
+
+    let i = 0;
+    function typeNext() {
+      if (i >= chunks.length) {
+        if (cursor) cursor.style.display = 'none';
+        /* 最终保底：确保完整文本已写入 */
+        if (textSpan.textContent !== text) textSpan.textContent = text;
+        if (callback) callback();
+        return;
+      }
+      textSpan.textContent += chunks[i];
+      i++;
       msgList.scrollTop = msgList.scrollHeight;
       addTimeout(typeNext, CHAR_SPEED);
     }
@@ -858,7 +885,9 @@ body{
 
   /* ============ 渐显效果（蛋黄用） ============ */
   function fadeInText(el, text, callback) {
+    if (!el || !text) { if (callback) callback(); return; }
     const textSpan = el.querySelector('.bubble-text');
+    if (!textSpan) { if (callback) callback(); return; }
     textSpan.textContent = text;
     textSpan.style.opacity = '0';
     textSpan.style.transition = 'opacity .35s ease';
@@ -903,7 +932,7 @@ body{
         <div class="bubble-wrap has-avatar">
           <span class="sender-name" style="${nameAlign}">${member.name}</span>
           <div class="bubble" data-emotion="${emotion}" id="${bubbleId}">
-            <span class="bubble-text"></span><span class="typing-cursor" style="display:none"></span>
+            <span class="bubble-text"></span>
             ${sparklesHTML}${angerHTML}
           </div>
         </div>
@@ -932,13 +961,18 @@ body{
     msgList.appendChild(row);
     if (emptyState) emptyState.style.display = 'none';
 
+    /* 直接从 row 内部查找 bubble，避免 getElementById 查不到 */
+    const bubbleEl = row.querySelector('.bubble');
+    const avatarEl = row.querySelector('.avatar-character');
+
     requestAnimationFrame(() => {
       row.classList.add('show');
       msgList.scrollTop = msgList.scrollHeight;
 
       if (hasAvatar) {
-        const avatar = document.getElementById(avatarId);
-        const videoEl = avatar ? avatar.querySelector('video') : null;
+        const avatar = avatarEl || document.getElementById(avatarId);
+        if (!avatar) { if (callback) callback(); return; }
+        const videoEl = avatar.querySelector('video');
         /* 确保视频能播放 */
         if (videoEl) {
           videoEl.play().catch(() => {});
@@ -948,11 +982,14 @@ body{
           addTimeout(() => {
             avatar.classList.add('speaking');
             addTimeout(() => {
-              const bubble = document.getElementById(bubbleId);
+              const bubble = bubbleEl || document.getElementById(bubbleId);
+              if (!bubble) { avatar.classList.remove('speaking'); if (callback) callback(); return; }
               bubble.classList.add('show');
               speakText(text, voice);
               addTimeout(() => {
                 typeWriter(bubble, text, () => {
+                  const ts = bubble.querySelector('.bubble-text');
+                  if (ts && !ts.textContent && text) ts.textContent = text;
                   avatar.classList.remove('speaking');
                   msgList.scrollTop = msgList.scrollHeight;
                   if (callback) callback();
@@ -964,11 +1001,15 @@ body{
       } else {
         /* 无 avatar：气泡渐显，文字直接显示 */
         addTimeout(() => {
-          const bubble = document.getElementById(bubbleId);
+          const bubble = bubbleEl || document.getElementById(bubbleId);
+          if (!bubble) { if (callback) callback(); return; }
           bubble.classList.add('show');
           speakText(text, voice);
           addTimeout(() => {
             fadeInText(bubble, text, () => {
+              /* fallback: 确保文字显示 */
+              const ts = bubble.querySelector('.bubble-text');
+              if (ts && !ts.textContent && text) ts.textContent = text;
               msgList.scrollTop = msgList.scrollHeight;
               if (callback) callback();
             });
@@ -1176,19 +1217,21 @@ body{
     sendBtn.disabled = inputField.value.trim().length === 0;
   });
 
-  inputField.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.isComposing && inputField.value.trim()) {
-      e.preventDefault();
-      sendMessage();
-    }
-  });
-
   /* 处理中文输入法 */
   let isComposing = false;
   inputField.addEventListener('compositionstart', () => { isComposing = true; });
   inputField.addEventListener('compositionend', () => {
     isComposing = false;
     sendBtn.disabled = inputField.value.trim().length === 0;
+  });
+
+  inputField.addEventListener('keydown', (e) => {
+    /* keyCode 229 = IME 处理中，不发送 */
+    if (e.keyCode === 229) return;
+    if (e.key === 'Enter' && !e.isComposing && !isComposing && inputField.value.trim()) {
+      e.preventDefault();
+      sendMessage();
+    }
   });
 
   sendBtn.addEventListener('click', () => {
