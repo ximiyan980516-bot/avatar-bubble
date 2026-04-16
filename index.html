@@ -312,22 +312,6 @@ body{
   border-image:none;padding:9px 14px;display:block;
 }
 
-/* ============ 气泡 A（圆角） ============ */
-[data-bubble="A"] .msg-row.left .has-avatar .bubble{
-  margin-left:-6px;
-  border-image-source:url('bubble-right.png');
-  border-image-slice:63 67 66 85 fill;
-  border-image-width:21px 22px 22px 28px;
-  padding:8px 14px 8px 19px;
-}
-[data-bubble="A"] .msg-row.right .has-avatar .bubble{
-  margin-right:-6px;
-  border-image-source:url('bubble-left.png');
-  border-image-slice:63 85 66 67 fill;
-  border-image-width:21px 28px 22px 22px;
-  padding:8px 19px 8px 14px;
-}
-
 /* ============ 气泡 B（漫画方形） ============ */
 [data-bubble="B"] .msg-row.left .has-avatar .bubble{
   margin-left:-10px;
@@ -598,7 +582,6 @@ body{
     <!-- 气泡样式切换（长按显示） -->
     <div class="bubble-style-popup" id="bubbleStylePopup">
       <div class="style-toggle" id="bubbleStyleToggle">
-        <button data-bubble="A">气泡 A</button>
         <button data-bubble="B" class="active">气泡 B</button>
         <button data-bubble="C">气泡 C</button>
       </div>
@@ -1597,6 +1580,7 @@ window.addEventListener('unhandledrejection', function(e) {
     /* 电脑端：点击消息区域显示/隐藏 */
     msgList.addEventListener('click', (e) => {
       if (popup.contains(e.target)) return;
+      e.stopPropagation();
       popup.classList.toggle('show');
     });
   }
