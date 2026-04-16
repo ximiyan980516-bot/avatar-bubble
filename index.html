@@ -757,10 +757,19 @@ window.addEventListener('unhandledrejection', function(e) {
 
   /* ============ TTS 语音播放（Edge TTS 云端） ============ */
   const sharedAudio = document.createElement('audio');
+  sharedAudio.setAttribute('playsinline', '');
+  sharedAudio.setAttribute('webkit-playsinline', '');
+  sharedAudio.setAttribute('x5-playsinline', '');
+  sharedAudio.style.display = 'none';
   sharedAudio.volume = 0.85;
+  document.body.appendChild(sharedAudio);
+
   let audioUnlocked = false;
   const ttsQueue = [];
   let ttsPlaying = false;
+
+  /* 微信环境检测 */
+  const isWechat = /MicroMessenger/i.test(navigator.userAgent);
 
   function getTtsUrl(text, voiceConfig) {
     if (!voiceConfig || !voiceConfig.voiceName) return null;
@@ -784,6 +793,7 @@ window.addEventListener('unhandledrejection', function(e) {
     ttsPlaying = true;
     const url = ttsQueue.shift();
     sharedAudio.src = url;
+    sharedAudio.load();
     sharedAudio.play().catch(() => { playNextTts(); });
   }
 
@@ -795,6 +805,21 @@ window.addEventListener('unhandledrejection', function(e) {
     if (!url) return;
     ttsQueue.push(url);
     if (!ttsPlaying) playNextTts();
+  }
+
+  /* 微信 WeixinJSBridge 解锁音频 */
+  if (isWechat) {
+    if (typeof WeixinJSBridge !== 'undefined') {
+      WeixinJSBridge.invoke('getNetworkType', {}, function() {
+        sharedAudio.play().then(() => { sharedAudio.pause(); audioUnlocked = true; }).catch(() => {});
+      });
+    } else {
+      document.addEventListener('WeixinJSBridgeReady', function() {
+        WeixinJSBridge.invoke('getNetworkType', {}, function() {
+          sharedAudio.play().then(() => { sharedAudio.pause(); audioUnlocked = true; }).catch(() => {});
+        });
+      }, false);
+    }
   }
 
   /* ============ 打字机效果 ============ */
