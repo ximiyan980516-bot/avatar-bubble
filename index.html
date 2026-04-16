@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>QQ Avatar 聊天气泡交互原型</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -27,13 +27,24 @@
   --shadow-md:0 4px 12px rgba(0,0,0,.06);
   --shadow-lg:0 8px 30px rgba(0,0,0,.08);
 }
-html{font-size:16px}
+html{font-size:16px;height:100%}
+html,body{overscroll-behavior:none}
 body{
   font-family:var(--font);
   background:var(--gray-200);
   display:flex;flex-direction:column;align-items:center;
   min-height:100vh;padding:24px 16px 48px;
   color:var(--text-primary);overflow-x:hidden;
+}
+/* 手机端全屏：去掉 phone-frame 外壳，直接铺满 */
+@media (max-width:500px){
+  body{padding:0;background:var(--white)}
+  .phone-frame{
+    width:100%!important;height:100vh!important;height:100dvh!important;
+    border-radius:0!important;box-shadow:none!important;
+  }
+  .hint,.btn-clear{display:none!important}
+  .home-indicator{padding-bottom:env(safe-area-inset-bottom)}
 }
 
 /* ============ CONTROL BAR ============ */
@@ -1147,6 +1158,19 @@ body{
   }
   document.addEventListener('touchstart', unlockAudio, { once: true });
   document.addEventListener('click', unlockAudio, { once: true });
+
+  /* 移动端键盘弹起处理：消息滚到底部 */
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+      msgList.scrollTop = msgList.scrollHeight;
+    });
+  }
+  inputField.addEventListener('focus', () => {
+    setTimeout(() => {
+      msgList.scrollTop = msgList.scrollHeight;
+      inputField.scrollIntoView({ block: 'nearest' });
+    }, 300);
+  });
 
   inputField.addEventListener('input', () => {
     sendBtn.disabled = inputField.value.trim().length === 0;
