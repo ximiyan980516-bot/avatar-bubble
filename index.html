@@ -589,7 +589,7 @@ window.addEventListener('unhandledrejection', function(e) {
   const msgList = document.getElementById('msgList');
   const inputField = document.getElementById('inputField');
   const sendBtn = document.getElementById('sendBtn');
-  const emptyState = document.getElementById('emptyState');
+  let emptyState = document.getElementById('emptyState');
 
   let msgCounter = 0;
   let timeouts = [];
@@ -1239,6 +1239,9 @@ window.addEventListener('unhandledrejection', function(e) {
   document.getElementById('btnClear').addEventListener('click', () => {
     timeouts.forEach(t => clearTimeout(t));
     timeouts = [];
+    ttsQueue.length = 0;
+    ttsPlaying = false;
+    try { sharedAudio.pause(); } catch(e) {}
     msgList.innerHTML = '';
     msgCounter = 0;
     const es = document.createElement('div');
@@ -1254,6 +1257,7 @@ window.addEventListener('unhandledrejection', function(e) {
       <div class="empty-desc">输入文字发送后，群成员会回应你<br>有 Avatar 的角色会有说话动画和打字机效果</div>
     `;
     msgList.appendChild(es);
+    emptyState = es;
   });
 
 })();
