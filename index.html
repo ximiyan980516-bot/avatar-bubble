@@ -283,7 +283,7 @@ body{
   opacity:1;
 }
 
-/* ============ COMIC STYLE (漫画风) ============ */
+/* ============ COMIC STYLE (漫画风) - 基础 ============ */
 [data-style="comic"] .bubble{
   background:transparent;
   border:none;
@@ -297,34 +297,64 @@ body{
   padding:0 14px;
   min-height:42px;
 }
-/* 左侧有 avatar 的气泡（他人，尖角朝左：用翻转图） */
-[data-style="comic"] .msg-row.left .has-avatar .bubble{
+[data-style="comic"] .msg-row.left .has-avatar .bubble::before,
+[data-style="comic"] .msg-row.left .has-avatar .bubble::after,
+[data-style="comic"] .msg-row.right .has-avatar .bubble::before,
+[data-style="comic"] .msg-row.right .has-avatar .bubble::after{
+  display:none;
+}
+/* 蛋黄/普通头像 */
+[data-style="comic"] .msg-row.left .no-avatar .bubble{
+  background:var(--gray-200);border:none;border-radius:14px;box-shadow:none;
+  border-image:none;padding:9px 14px;display:block;
+}
+
+/* ============ 气泡 A（圆角） ============ */
+[data-bubble="A"] .msg-row.left .has-avatar .bubble{
   margin-left:-6px;
   border-image-source:url('bubble-right.png');
   border-image-slice:63 67 66 85 fill;
   border-image-width:21px 22px 22px 28px;
   padding:0 14px 0 19px;
 }
-[data-style="comic"] .msg-row.left .has-avatar .bubble::before,
-[data-style="comic"] .msg-row.left .has-avatar .bubble::after{
-  display:none;
-}
-/* 右侧 avatar（自己，尖角朝右：用原图） */
-[data-style="comic"] .msg-row.right .has-avatar .bubble{
+[data-bubble="A"] .msg-row.right .has-avatar .bubble{
   margin-right:-6px;
   border-image-source:url('bubble-left.png');
   border-image-slice:63 85 66 67 fill;
   border-image-width:21px 28px 22px 22px;
   padding:0 19px 0 14px;
 }
-[data-style="comic"] .msg-row.right .has-avatar .bubble::before,
-[data-style="comic"] .msg-row.right .has-avatar .bubble::after{
-  display:none;
+
+/* ============ 气泡 B（漫画方形） ============ */
+[data-bubble="B"] .msg-row.left .has-avatar .bubble{
+  margin-left:-10px;
+  border-image-source:url('bubbleB-left.png');
+  border-image-slice:75 84 36 120 fill;
+  border-image-width:25px 28px 12px 40px;
+  padding:0 22px 0 30px;
 }
-/* 蛋黄 */
-[data-style="comic"] .msg-row.left .no-avatar .bubble{
-  background:var(--gray-200);border:none;border-radius:14px;box-shadow:none;
-  border-image:none;padding:9px 14px;display:block;
+[data-bubble="B"] .msg-row.right .has-avatar .bubble{
+  margin-right:-10px;
+  border-image-source:url('bubbleB-right.png');
+  border-image-slice:75 120 36 84 fill;
+  border-image-width:25px 40px 12px 28px;
+  padding:0 30px 0 22px;
+}
+
+/* ============ 气泡 C（圆角双描边） ============ */
+[data-bubble="C"] .msg-row.left .has-avatar .bubble{
+  margin-left:-6px;
+  border-image-source:url('bubbleC-left.png');
+  border-image-slice:63 66 66 84 fill;
+  border-image-width:21px 22px 22px 28px;
+  padding:0 14px 0 19px;
+}
+[data-bubble="C"] .msg-row.right .has-avatar .bubble{
+  margin-right:-6px;
+  border-image-source:url('bubbleC-right.png');
+  border-image-slice:63 84 66 66 fill;
+  border-image-width:21px 28px 22px 22px;
+  padding:0 19px 0 14px;
 }
 
 /* ============ MODERN STYLE (现代风) ============ */
@@ -513,7 +543,7 @@ body{
 </style>
 </head>
 
-<body data-style="comic">
+<body data-style="comic" data-bubble="B">
 
 <!-- ============ PHONE FRAME ============ -->
 <div class="phone-frame">
@@ -577,10 +607,17 @@ body{
 </div>
 
 <p class="hint">QQ Avatar 聊天气泡交互原型</p>
-<button class="btn-clear" id="btnClear" style="margin-top:10px">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14"/></svg>
-  清空对话
-</button>
+<div style="display:flex;gap:10px;margin-top:10px;align-items:center">
+  <button class="btn-clear" id="btnClear">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14"/></svg>
+    清空对话
+  </button>
+  <div class="style-toggle" id="bubbleStyleToggle">
+    <button data-bubble="A">气泡 A</button>
+    <button data-bubble="B" class="active">气泡 B</button>
+    <button data-bubble="C">气泡 C</button>
+  </div>
+</div>
 
 <!-- ============ 调参面板 ============ -->
 <style>
@@ -815,6 +852,38 @@ window.addEventListener('unhandledrejection', function(e) {
           '了解',
           '行吧',
           'ok',
+        ]
+      }
+    },
+    {
+      name: '汽水泡泡',
+      avatar: '汽水泡泡头像.png',
+      hasAvatar: false,
+      side: 'left',
+      personality: 'bubbly',
+      voice: null,
+      responses: {
+        excited: [
+          '啊啊啊冲冲冲！',
+          '太棒了吧！我也要！',
+          '好开心好开心～',
+          '算我一个嘻嘻',
+          '必须安排！',
+        ],
+        angry: [
+          '不是吧不是吧...',
+          '也太过分了！',
+          '哼 生气了',
+          '我不管 不开心',
+        ],
+        neutral: [
+          '收到～',
+          '好的好的',
+          '嗯嗯',
+          '了解啦',
+          '行～',
+          '好嘞',
+          'okkk',
         ]
       }
     },
@@ -1163,36 +1232,42 @@ window.addEventListener('unhandledrejection', function(e) {
     '吃|饭|火锅|烧烤|奶茶|麻辣|美食|饿|午饭|晚饭|外卖|炸鸡|蛋糕': {
       'cool-guy': ['吃啥 我请', '火锅走起 我知道一家巨好吃的', '奶茶帮我带一杯 谢谢'],
       'chill': ['我也饿了', '吃什么呀', '带我一个', '外卖到了叫我'],
+      'bubbly': ['我要奶茶！大杯的！', '吃吃吃 走起～', '帮我也带一份嘛'],
       'cool': ['走啊 刚好没吃呢～', '啊我也想吃！你推荐啥', '奶茶！我要喝！'],
       'sweet': ['天哪我也超想吃的！(ﾉ´ヮ`)ﾉ', '一起一起！我要奶茶！♡', '好饿好饿 快冲！'],
     },
     '玩|游戏|王者|吃鸡|原神|联机|开黑|上分|段位|排位': {
       'cool-guy': ['来 开一把', '我段位掉了 带我上分', '今晚开黑吗'],
       'chill': ['来了来了', '等我五分钟', '我也要玩', '开！'],
+      'bubbly': ['等我等我 马上上线', '我也要打！', '带我上分嘛～'],
       'cool': ['好呀好呀 等我登录～', '我来我来！打什么', '一起一起 我超强的！'],
       'sweet': ['我也要！等等我！(≧▽≦)', '带我带我～虽然我菜', '开开开！♡'],
     },
     '出去|出发|旅游|玩|去哪|周末|假期|放假|镰仓|海边|爬山|露营|音乐节': {
       'cool-guy': ['走 说走就走', '我车都准备好了', '这波必须去 不接受反驳', '目的地发一下'],
       'chill': ['去哪呀', '我也想出去玩', '算我一个吧', '好耶 出发'],
+      'bubbly': ['我也要去！等等我', '拍照拍照 必须拍', '好期待啊走走走'],
       'cool': ['啊啊啊一起去！我要拍照！', '冲冲冲～收拾行李了', '去去去！好期待！'],
       'sweet': ['天哪我超想去的！✨', '一起一起！拍美照！(ﾉ◕ヮ◕)ﾉ', '好棒！我要去！♡'],
     },
     '考试|作业|上课|老师|学校|期末|及格|挂科|论文|复习|成绩': {
       'cool-guy': ['稳的 我抄你的', '别提了 头大', '考完请你们吃饭', '无所谓 反正都是命'],
       'chill': ['我还没开始复习', '完了完了', '互相抄吧', '别说了别说了'],
+      'bubbly': ['完了完了我也没看', '一起复习吧求求了', '别提了头秃'],
       'cool': ['我也没复习呜呜～', '谁能救救我的成绩', '考试什么的最讨厌了(╥_╥)'],
       'sweet': ['啊啊啊我也没复习！！', '一起图书馆吧互相监督(•̀ᴗ•́)و', '加油加油 我们可以的！'],
     },
     '好看|帅|美|漂亮|可爱|穿搭|衣服|拍照|自拍|滤镜': {
       'cool-guy': ['谢谢 我知道', '低调低调', '天生的 没办法'],
       'chill': ['确实好看', '不错不错', '拍得好'],
+      'bubbly': ['好好看！链接发我', '绝了 太会穿了', '我也想要同款'],
       'cool': ['真的吗 我也觉得！嘻嘻', '好好看啊～教教我', '在哪拍的呀 我也想去！'],
       'sweet': ['天哪也太好看了叭！♡', '绝了绝了 好会拍！✨', '我也想要同款！(≧∇≦)/'],
     },
     '无聊|没意思|干嘛|干啥|做什么|好闷': {
       'cool-guy': ['出来滑板', '走 带你飞', '打游戏不'],
       'chill': ['我也无聊', '看视频吧', '睡觉？', '刷手机'],
+      'bubbly': ['一起逛街吧', '我也好无聊 聊天吗', '看剧吗 推荐一个'],
       'cool': ['我也是～要不出去逛逛？', '找点事做叭 一起', '无聊就来找我玩呀～'],
       'sweet': ['一起聊天呀！我有八卦！', '要不要视频通话(◕ᴗ◕✿)', '我也无聊 陪你！'],
     },
@@ -1200,9 +1275,28 @@ window.addEventListener('unhandledrejection', function(e) {
 
   function generateReplies(userText) {
     const emotion = detectEmotion(userText);
-    const shuffled = [...MEMBERS].sort(() => Math.random() - 0.5);
-    const replyCount = Math.random() < 0.25 ? 1 : (Math.random() < 0.55 ? 2 : Math.min(3, MEMBERS.length));
-    const repliers = shuffled.slice(0, replyCount);
+
+    /* 分组：有形象 vs 普通头像 */
+    const avatarMembers = MEMBERS.filter(m => m.hasAvatar);
+    const normalMembers = MEMBERS.filter(m => !m.hasAvatar);
+
+    /* 各组随机选一个，确保至少各有一个 */
+    const pickAvatar = avatarMembers.sort(() => Math.random() - 0.5);
+    const pickNormal = normalMembers.sort(() => Math.random() - 0.5);
+
+    const repliers = [];
+    if (pickNormal.length) repliers.push(pickNormal[0]);
+    if (pickAvatar.length) repliers.push(pickAvatar[0]);
+
+    /* 随机再多加 1-2 个（从剩余成员中选） */
+    const remaining = MEMBERS.filter(m => !repliers.includes(m)).sort(() => Math.random() - 0.5);
+    const extraCount = Math.random() < 0.4 ? 1 : (Math.random() < 0.7 ? 0 : 2);
+    for (let e = 0; e < extraCount && e < remaining.length; e++) {
+      repliers.push(remaining[e]);
+    }
+
+    /* 打乱回复顺序 */
+    repliers.sort(() => Math.random() - 0.5);
 
     const replies = [];
     for (const member of repliers) {
@@ -1452,6 +1546,20 @@ window.addEventListener('unhandledrejection', function(e) {
         if (valSpan) valSpan.textContent = val;
       }
     });
+  });
+})();
+
+/* 气泡 A/B 切换 */
+(function(){
+  const toggle = document.getElementById('bubbleStyleToggle');
+  if (!toggle) return;
+  toggle.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-bubble]');
+    if (!btn) return;
+    const style = btn.dataset.bubble;
+    document.body.setAttribute('data-bubble', style);
+    toggle.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
   });
 })();
 </script>
