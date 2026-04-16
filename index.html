@@ -773,8 +773,8 @@ window.addEventListener('unhandledrejection', function(e) {
     /* 停止上一条语音 */
     if (currentAudio) {
       try {
-        if (typeof currentAudio.pause === 'function') currentAudio.pause();
-        else if (typeof currentAudio.stop === 'function') currentAudio.stop();
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
       } catch(e) {}
       currentAudio = null;
     }
@@ -787,36 +787,18 @@ window.addEventListener('unhandledrejection', function(e) {
     const pitch = encodeURIComponent(voiceConfig.pitch || '+0Hz');
     const url = `${TTS_BASE}/tts?voice=${voice}&text=${encoded}&rate=${rate}&pitch=${pitch}`;
 
-    /* 用 fetch + AudioContext 播放，兼容微信 */
-    fetch(url)
-      .then(res => {
-        if (!res.ok) throw new Error('TTS fetch failed');
-        return res.arrayBuffer();
-      })
-      .then(buf => {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        return ctx.decodeAudioData(buf).then(decoded => {
-          const source = ctx.createBufferSource();
-          source.buffer = decoded;
-          const gain = ctx.createGain();
-          gain.gain.value = 0.85;
-          source.connect(gain);
-          gain.connect(ctx.destination);
-          if (currentAudio && currentAudio.stop) {
-            try { currentAudio.stop(); } catch(e) {}
-          }
-          currentAudio = source;
-          source.start(0);
-        });
-      })
-      .catch(() => {
-        /* 最终回退：浏览器 TTS */
-        if (window.speechSynthesis) {
-          const utter = new SpeechSynthesisUtterance(cleanText);
-          utter.lang = 'zh-CN';
-          utter.rate = 1;
-          utter.pitch = 1;
-          window.speechSynthesis.speak(utter);
+    /* 用 Audio 元素播放，手机兼容性最好 */
+    const audio = new Audio(url);
+    audio.volume = 0.85;
+    currentAudio = audio;
+    audio.play().catch(() => {
+      /* 回退：浏览器 TTS */
+      if (window.speechSynthesis) {
+        const utter = new SpeechSynthesisUtterance(cleanText);
+        utter.lang = 'zh-CN';
+        utter.rate = 1;
+        utter.pitch = 1;
+        window.speechSynthesis.speak(utter);
       }
     });
   }
