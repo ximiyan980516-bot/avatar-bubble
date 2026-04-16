@@ -756,53 +756,45 @@ window.addEventListener('unhandledrejection', function(e) {
   }
 
   /* ============ TTS 语音播放（Edge TTS 云端） ============ */
-  /* 全局复用的 audio 元素，在用户交互时解锁 */
   const sharedAudio = document.createElement('audio');
   sharedAudio.volume = 0.85;
   let audioUnlocked = false;
+  const ttsQueue = [];
+  let ttsPlaying = false;
 
-  function unlockSharedAudio() {
-    if (audioUnlocked) return;
-    /* 播放一段极短的静音 data URI 来解锁 */
-    sharedAudio.src = 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYoRBqSAAAAAAAAAAAAAAAAAAAA//tQZAAP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAETEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tQZB8P8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV';
-    sharedAudio.play().then(() => {
-      audioUnlocked = true;
-    }).catch(() => {});
-  }
-
-  function speakText(text, voiceConfig) {
-    if (!voiceConfig || !voiceConfig.voiceName) return;
-
-    /* 清理颜文字 */
+  function getTtsUrl(text, voiceConfig) {
+    if (!voiceConfig || !voiceConfig.voiceName) return null;
     const cleanText = text
       .replace(/[\(（][^\)）]*[\)）][ノゞ♪♡~～シ]*/g, '')
       .replace(/[✨⭐💫✦♡✧★☆♪·:]/g, '')
       .replace(/[+]+/g, '加')
       .replace(/[^\u4e00-\u9fa5a-zA-Z0-9，。！？、～~\s]/g, '')
       .trim();
-    if (!cleanText || cleanText.length < 2) return;
-
-    /* TTS 服务器地址：统一使用云端 Edge TTS */
+    if (!cleanText || cleanText.length < 2) return null;
     const TTS_BASE = 'https://edge-tts-server-mu.vercel.app';
     const voice = encodeURIComponent(voiceConfig.voiceName);
     const encoded = encodeURIComponent(cleanText);
     const rate = encodeURIComponent(voiceConfig.rate || '+0%');
     const pitch = encodeURIComponent(voiceConfig.pitch || '+0Hz');
-    const url = `${TTS_BASE}/tts?voice=${voice}&text=${encoded}&rate=${rate}&pitch=${pitch}`;
+    return `${TTS_BASE}/tts?voice=${voice}&text=${encoded}&rate=${rate}&pitch=${pitch}`;
+  }
 
-    /* 用已解锁的 sharedAudio 播放 */
-    try { sharedAudio.pause(); } catch(e) {}
+  function playNextTts() {
+    if (ttsQueue.length === 0) { ttsPlaying = false; return; }
+    ttsPlaying = true;
+    const url = ttsQueue.shift();
     sharedAudio.src = url;
-    sharedAudio.play().catch(() => {
-      /* 回退：浏览器 TTS */
-      if (window.speechSynthesis) {
-        const utter = new SpeechSynthesisUtterance(cleanText);
-        utter.lang = 'zh-CN';
-        utter.rate = 1;
-        utter.pitch = 1;
-        window.speechSynthesis.speak(utter);
-      }
-    });
+    sharedAudio.play().catch(() => { playNextTts(); });
+  }
+
+  sharedAudio.addEventListener('ended', playNextTts);
+  sharedAudio.addEventListener('error', playNextTts);
+
+  function speakText(text, voiceConfig) {
+    const url = getTtsUrl(text, voiceConfig);
+    if (!url) return;
+    ttsQueue.push(url);
+    if (!ttsPlaying) playNextTts();
   }
 
   /* ============ 打字机效果 ============ */
@@ -1152,6 +1144,16 @@ window.addEventListener('unhandledrejection', function(e) {
     const text = inputField.value.trim();
     if (!text) return;
 
+    /* 在用户点击的同步调用栈中立刻 play 解锁 audio（Safari 要求） */
+    const selfUrl = getTtsUrl(text, SELF.voice);
+    if (selfUrl) {
+      ttsQueue.length = 0; /* 清空之前的队列 */
+      sharedAudio.src = selfUrl;
+      sharedAudio.play().catch(() => {});
+      ttsPlaying = true;
+      audioUnlocked = true;
+    }
+
     const emotion = detectEmotion(text);
     const msgData = createMessageEl(SELF, text, emotion, 'right');
 
@@ -1169,8 +1171,6 @@ window.addEventListener('unhandledrejection', function(e) {
   }
 
   /* ============ 输入事件 ============ */
-  document.addEventListener('touchstart', unlockSharedAudio, { once: true });
-  document.addEventListener('click', unlockSharedAudio, { once: true });
 
   /* 移动端键盘弹起处理：消息滚到底部 */
   if (window.visualViewport) {
