@@ -974,7 +974,6 @@ window.addEventListener('unhandledrejection', function(e) {
         const avatar = avatarEl || document.getElementById(avatarId);
         if (!avatar) { if (callback) callback(); return; }
         const videoEl = avatar.querySelector('video');
-        /* 确保视频能播放 */
         if (videoEl) {
           videoEl.play().catch(() => {});
         }
@@ -985,20 +984,18 @@ window.addEventListener('unhandledrejection', function(e) {
             addTimeout(() => {
               const bubble = bubbleEl || document.getElementById(bubbleId);
               if (!bubble) { avatar.classList.remove('speaking'); if (callback) callback(); return; }
+              const ts = bubble.querySelector('.bubble-text');
+              if (ts) ts.textContent = text;
               bubble.classList.add('show');
               if (!skipSpeak) speakText(text, voice);
               addTimeout(() => {
-                typeWriter(bubble, text, () => {
-                  const ts = bubble.querySelector('.bubble-text');
-                  if (ts && !ts.textContent && text) ts.textContent = text;
-                  avatar.classList.remove('speaking');
-                  msgList.scrollTop = msgList.scrollHeight;
-                  if (callback) callback();
-                });
-              }, 120);
-            }, BUBBLE_DELAY);
-          }, 150);
-        }, 40);
+                avatar.classList.remove('speaking');
+                msgList.scrollTop = msgList.scrollHeight;
+                if (callback) callback();
+              }, 300);
+            }, 150);
+          }, 100);
+        }, 30);
       } else {
         /* 无 avatar：气泡渐显，文字直接显示 */
         addTimeout(() => {
