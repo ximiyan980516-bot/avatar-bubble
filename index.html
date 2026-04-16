@@ -756,7 +756,19 @@ window.addEventListener('unhandledrejection', function(e) {
   }
 
   /* ============ TTS 语音播放（Edge TTS 云端） ============ */
-  let currentAudio = null;
+  /* 全局复用的 audio 元素，在用户交互时解锁 */
+  const sharedAudio = document.createElement('audio');
+  sharedAudio.volume = 0.85;
+  let audioUnlocked = false;
+
+  function unlockSharedAudio() {
+    if (audioUnlocked) return;
+    /* 播放一段极短的静音 data URI 来解锁 */
+    sharedAudio.src = 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYoRBqSAAAAAAAAAAAAAAAAAAAA//tQZAAP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAETEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tQZB8P8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV';
+    sharedAudio.play().then(() => {
+      audioUnlocked = true;
+    }).catch(() => {});
+  }
 
   function speakText(text, voiceConfig) {
     if (!voiceConfig || !voiceConfig.voiceName) return;
@@ -770,15 +782,6 @@ window.addEventListener('unhandledrejection', function(e) {
       .trim();
     if (!cleanText || cleanText.length < 2) return;
 
-    /* 停止上一条语音 */
-    if (currentAudio) {
-      try {
-        currentAudio.pause();
-        currentAudio.currentTime = 0;
-      } catch(e) {}
-      currentAudio = null;
-    }
-
     /* TTS 服务器地址：统一使用云端 Edge TTS */
     const TTS_BASE = 'https://edge-tts-server-mu.vercel.app';
     const voice = encodeURIComponent(voiceConfig.voiceName);
@@ -787,11 +790,10 @@ window.addEventListener('unhandledrejection', function(e) {
     const pitch = encodeURIComponent(voiceConfig.pitch || '+0Hz');
     const url = `${TTS_BASE}/tts?voice=${voice}&text=${encoded}&rate=${rate}&pitch=${pitch}`;
 
-    /* 用 Audio 元素播放，手机兼容性最好 */
-    const audio = new Audio(url);
-    audio.volume = 0.85;
-    currentAudio = audio;
-    audio.play().catch(() => {
+    /* 用已解锁的 sharedAudio 播放 */
+    try { sharedAudio.pause(); } catch(e) {}
+    sharedAudio.src = url;
+    sharedAudio.play().catch(() => {
       /* 回退：浏览器 TTS */
       if (window.speechSynthesis) {
         const utter = new SpeechSynthesisUtterance(cleanText);
@@ -1167,20 +1169,8 @@ window.addEventListener('unhandledrejection', function(e) {
   }
 
   /* ============ 输入事件 ============ */
-  /* 预初始化 AudioContext（微信要求用户交互后才能播放） */
-  let audioCtxUnlocked = false;
-  function unlockAudio() {
-    if (audioCtxUnlocked) return;
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const buf = ctx.createBuffer(1, 1, 22050);
-    const src = ctx.createBufferSource();
-    src.buffer = buf;
-    src.connect(ctx.destination);
-    src.start(0);
-    audioCtxUnlocked = true;
-  }
-  document.addEventListener('touchstart', unlockAudio, { once: true });
-  document.addEventListener('click', unlockAudio, { once: true });
+  document.addEventListener('touchstart', unlockSharedAudio, { once: true });
+  document.addEventListener('click', unlockSharedAudio, { once: true });
 
   /* 移动端键盘弹起处理：消息滚到底部 */
   if (window.visualViewport) {
