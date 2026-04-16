@@ -5,3 +5,8 @@ __pycache__
 tts_server.py
 *.mp4
 .codebuddy/
+# 原始大 APNG（用 _small 版本替代）
+古风_00000_iSpt.png
+街头_00000_iSpt.png
+原神_00000_iSpt.png
+甜美_00000_iSpt.png
