@@ -956,7 +956,7 @@ window.addEventListener('unhandledrejection', function(e) {
   }
 
   /* ============ 动画播放单条消息 ============ */
-  function animateMessage(msgData, callback) {
+  function animateMessage(msgData, callback, skipSpeak) {
     const { row, bubbleId, avatarId, hasAvatar, text, voice } = msgData;
 
     msgList.appendChild(row);
@@ -986,7 +986,7 @@ window.addEventListener('unhandledrejection', function(e) {
               const bubble = bubbleEl || document.getElementById(bubbleId);
               if (!bubble) { avatar.classList.remove('speaking'); if (callback) callback(); return; }
               bubble.classList.add('show');
-              speakText(text, voice);
+              if (!skipSpeak) speakText(text, voice);
               addTimeout(() => {
                 typeWriter(bubble, text, () => {
                   const ts = bubble.querySelector('.bubble-text');
@@ -1005,7 +1005,7 @@ window.addEventListener('unhandledrejection', function(e) {
           const bubble = bubbleEl || document.getElementById(bubbleId);
           if (!bubble) { if (callback) callback(); return; }
           bubble.classList.add('show');
-          speakText(text, voice);
+          if (!skipSpeak) speakText(text, voice);
           addTimeout(() => {
             fadeInText(bubble, text, () => {
               /* fallback: 确保文字显示 */
@@ -1192,7 +1192,7 @@ window.addEventListener('unhandledrejection', function(e) {
         const replies = generateReplies(text);
         playReplies(replies, 0);
       }, delay);
-    });
+    }, true); /* skipSpeak: 自己的语音已在上面同步播放 */
   }
 
   /* ============ 输入事件 ============ */
