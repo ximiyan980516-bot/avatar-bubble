@@ -35,7 +35,7 @@
 
   /* Avatar 角色 */
   --avatar-slide-y: 16px;            /* avatar 初始下移距离 */
-  --avatar-show-y: 10px;             /* avatar 最终 Y 偏移 */
+  --avatar-show-y: -15px;              /* avatar 最终 Y 偏移 */
   --avatar-duration: 0.3s;           /* avatar 动画时长 */
   --avatar-easing: cubic-bezier(.34,1.56,.64,1); /* avatar 缓动曲线 */
 
@@ -149,7 +149,7 @@ body{
 /* ============ MESSAGE LIST ============ */
 .msg-list{
   flex:1;overflow-y:auto;overflow-x:hidden;
-  padding:8px 4px;background:var(--white);
+  padding:18px 4px 18px;background:var(--white);
   display:flex;flex-direction:column;gap:0;
   scroll-behavior:smooth;
 }
@@ -180,8 +180,8 @@ body{
 
 /* ============ MESSAGE ROW ============ */
 .msg-row{
-  display:flex;align-items:flex-end;gap:0;
-  min-height:48px;
+  display:flex;align-items:flex-start;gap:0;
+  min-height:90px;
   flex-shrink:0;
   opacity:0;transform:translateY(var(--row-slide-y));
   transition:opacity var(--row-duration) ease,transform var(--row-duration) var(--row-easing);
@@ -223,9 +223,11 @@ body{
 
 /* ============ NORMAL AVATAR ============ */
 .normal-avatar{
-  width:60px;height:90px;flex-shrink:0;
-  display:flex;align-items:flex-end;justify-content:center;
+  width:60px;flex-shrink:0;
+  display:flex;align-items:flex-start;justify-content:center;
+  padding-top:18px;
   margin-left:0;margin-right:0;
+  min-height:90px;
 }
 .normal-avatar img{width:40px;height:40px;border-radius:20px;object-fit:cover;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 
@@ -233,7 +235,8 @@ body{
 .bubble-wrap{display:flex;flex-direction:column;max-width:260px;position:relative}
 .msg-row.right .bubble-wrap{align-items:flex-end}
 .msg-row.left .bubble-wrap{align-items:flex-start;margin-left:0}
-.msg-row.left .bubble-wrap.no-avatar{margin-left:0}.sender-name{
+.msg-row.left .bubble-wrap.no-avatar{margin-left:0}
+.sender-name{
   font-size:11px;color:var(--text-secondary);margin-bottom:5px;
   padding:0 6px;font-weight:500;
 }
@@ -294,7 +297,7 @@ body{
   border-style:solid;
   border-width:0;
   display:flex;align-items:center;
-  padding:0 14px;
+  padding:8px 14px;
   min-height:42px;
 }
 [data-style="comic"] .msg-row.left .has-avatar .bubble::before,
@@ -315,14 +318,14 @@ body{
   border-image-source:url('bubble-right.png');
   border-image-slice:63 67 66 85 fill;
   border-image-width:21px 22px 22px 28px;
-  padding:0 14px 0 19px;
+  padding:8px 14px 8px 19px;
 }
 [data-bubble="A"] .msg-row.right .has-avatar .bubble{
   margin-right:-6px;
   border-image-source:url('bubble-left.png');
   border-image-slice:63 85 66 67 fill;
   border-image-width:21px 28px 22px 22px;
-  padding:0 19px 0 14px;
+  padding:8px 19px 8px 14px;
 }
 
 /* ============ 气泡 B（漫画方形） ============ */
@@ -331,14 +334,14 @@ body{
   border-image-source:url('bubbleB-left.png');
   border-image-slice:75 84 36 120 fill;
   border-image-width:25px 28px 12px 40px;
-  padding:0 22px 0 30px;
+  padding:8px 22px 8px 30px;
 }
 [data-bubble="B"] .msg-row.right .has-avatar .bubble{
   margin-right:-10px;
   border-image-source:url('bubbleB-right.png');
   border-image-slice:75 120 36 84 fill;
   border-image-width:25px 40px 12px 28px;
-  padding:0 30px 0 22px;
+  padding:8px 30px 8px 22px;
 }
 
 /* ============ 气泡 C（圆角双描边） ============ */
@@ -347,14 +350,14 @@ body{
   border-image-source:url('bubbleC-left.png');
   border-image-slice:63 66 66 84 fill;
   border-image-width:21px 22px 22px 28px;
-  padding:0 14px 0 19px;
+  padding:8px 14px 8px 19px;
 }
 [data-bubble="C"] .msg-row.right .has-avatar .bubble{
   margin-right:-6px;
   border-image-source:url('bubbleC-right.png');
   border-image-slice:63 84 66 66 fill;
   border-image-width:21px 28px 22px 22px;
-  padding:0 19px 0 14px;
+  padding:8px 19px 8px 14px;
 }
 
 /* ============ MODERN STYLE (现代风) ============ */
@@ -540,6 +543,26 @@ body{
 
 /* ============ HINT ============ */
 .hint{color:var(--text-tertiary);font-size:11px;margin-top:16px;text-align:center;letter-spacing:.3px}
+
+/* ============ 气泡样式切换悬浮面板 ============ */
+.bubble-style-popup{
+  position:sticky;top:50%;z-index:50;
+  display:none;
+  justify-content:center;
+  padding:0;margin:-20px auto 0;
+  pointer-events:none;
+}
+.bubble-style-popup.show{
+  display:flex;
+}
+.bubble-style-popup .style-toggle{
+  pointer-events:auto;
+  box-shadow:0 4px 16px rgba(0,0,0,.12);
+  background:rgba(255,255,255,.95);
+  backdrop-filter:blur(12px);
+  border-radius:10px;
+  padding:3px;
+}
 </style>
 </head>
 
@@ -572,6 +595,14 @@ body{
 
   <!-- ============ MESSAGE LIST ============ -->
   <div class="msg-list" id="msgList">
+    <!-- 气泡样式切换（长按显示） -->
+    <div class="bubble-style-popup" id="bubbleStylePopup">
+      <div class="style-toggle" id="bubbleStyleToggle">
+        <button data-bubble="A">气泡 A</button>
+        <button data-bubble="B" class="active">气泡 B</button>
+        <button data-bubble="C">气泡 C</button>
+      </div>
+    </div>
     <div class="empty-state" id="emptyState">
       <div class="empty-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
@@ -612,11 +643,6 @@ body{
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14"/></svg>
     清空对话
   </button>
-  <div class="style-toggle" id="bubbleStyleToggle">
-    <button data-bubble="A">气泡 A</button>
-    <button data-bubble="B" class="active">气泡 B</button>
-    <button data-bubble="C">气泡 C</button>
-  </div>
 </div>
 
 <!-- ============ 调参面板 ============ -->
@@ -1549,18 +1575,55 @@ window.addEventListener('unhandledrejection', function(e) {
   });
 })();
 
-/* 气泡 A/B 切换 */
+/* 气泡 A/B/C 切换：手机长按显示，电脑点击显示 */
 (function(){
+  const popup = document.getElementById('bubbleStylePopup');
   const toggle = document.getElementById('bubbleStyleToggle');
-  if (!toggle) return;
+  const msgList = document.getElementById('msgList');
+  if (!popup || !toggle || !msgList) return;
+
+  const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  let longPressTimer = null;
+
+  if (isMobile) {
+    /* 手机端：长按显示 */
+    msgList.addEventListener('touchstart', (e) => {
+      longPressTimer = setTimeout(() => { popup.classList.add('show'); }, 500);
+    }, { passive: true });
+    msgList.addEventListener('touchend', () => { clearTimeout(longPressTimer); });
+    msgList.addEventListener('touchcancel', () => { clearTimeout(longPressTimer); });
+    msgList.addEventListener('touchmove', () => { clearTimeout(longPressTimer); });
+  } else {
+    /* 电脑端：点击消息区域显示/隐藏 */
+    msgList.addEventListener('click', (e) => {
+      if (popup.contains(e.target)) return;
+      popup.classList.toggle('show');
+    });
+  }
+
+  /* 点击切换按钮 */
   toggle.addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-bubble]');
     if (!btn) return;
-    const style = btn.dataset.bubble;
-    document.body.setAttribute('data-bubble', style);
+    e.stopPropagation();
+    document.body.setAttribute('data-bubble', btn.dataset.bubble);
     toggle.querySelectorAll('button').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+    /* 切换后自动隐藏 */
+    setTimeout(() => popup.classList.remove('show'), 300);
   });
+
+  /* 点击其他地方消失 */
+  document.addEventListener('click', (e) => {
+    if (!popup.contains(e.target)) {
+      popup.classList.remove('show');
+    }
+  });
+  document.addEventListener('touchstart', (e) => {
+    if (!popup.contains(e.target)) {
+      popup.classList.remove('show');
+    }
+  }, { passive: true });
 })();
 </script>
 
