@@ -1205,6 +1205,12 @@ window.addEventListener('unhandledrejection', function(e) {
               const ts = bubble.querySelector('.bubble-text');
               if (ts) ts.textContent = text;
               bubble.classList.add('show');
+              /* 文本写入后检测：两行时补偿 cell 高度 */
+              requestAnimationFrame(() => {
+                if (bubble.offsetHeight > 60) {
+                  row.style.minHeight = (90 + bubble.offsetHeight - 54) + 'px';
+                }
+              });
               if (!skipSpeak) speakText(text, voice);
               addTimeout(() => {
                 avatar.classList.remove('speaking');
@@ -1225,6 +1231,12 @@ window.addEventListener('unhandledrejection', function(e) {
             fadeInText(bubble, text, () => {
               const ts = bubble.querySelector('.bubble-text');
               if (ts && !ts.textContent && text) ts.textContent = text;
+              /* 文本写入后检测：两行时补偿 cell 高度 */
+              requestAnimationFrame(() => {
+                if (bubble.offsetHeight > 60) {
+                  row.style.minHeight = (90 + bubble.offsetHeight - 54) + 'px';
+                }
+              });
               msgList.scrollTop = msgList.scrollHeight;
               if (callback) callback();
             });
