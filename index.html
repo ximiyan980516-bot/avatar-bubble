@@ -547,6 +547,149 @@ body{
   border-radius:10px;
   padding:3px;
 }
+
+/* ============ 半屏形象面板 ============ */
+.avatar-sheet-overlay{
+  position:absolute;inset:0;z-index:80;
+  background:rgba(0,0,0,.5);
+  opacity:0;pointer-events:none;
+  transition:opacity .3s ease;
+}
+.avatar-sheet-overlay.show{opacity:1;pointer-events:auto}
+
+.avatar-sheet{
+  position:absolute;left:0;right:0;bottom:0;z-index:81;
+  height:66%;
+  background:#F5F6FA;
+  border-radius:24px 24px 0 0;
+  box-shadow:0 -4px 12px rgba(0,0,0,.05);
+  transform:translateY(100%);
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
+  display:flex;flex-direction:column;
+}
+.avatar-sheet.show{transform:translateY(0)}
+
+.avatar-sheet-header{
+  display:flex;align-items:center;justify-content:center;
+  padding:22px 16px 0;
+  flex-shrink:0;
+  position:relative;
+}
+.avatar-sheet-title{
+  font-size:17px;font-weight:500;
+  color:rgba(0,0,0,.9);
+  font-family:var(--font);
+}
+.avatar-sheet-close{
+  position:absolute;right:16px;top:14px;
+  width:30px;height:30px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:50%;
+  background:rgba(0,0,0,.05);
+  cursor:pointer;
+}
+.avatar-sheet-close:active{background:rgba(0,0,0,.1)}
+
+.avatar-sheet-body{
+  flex:1;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+
+/* 形象大图 */
+.avatar-sheet-figure{
+  width:120%;max-width:450px;
+  display:flex;align-items:flex-end;justify-content:center;
+  will-change:transform;
+}
+.avatar-sheet-figure img{
+  width:100%;height:auto;
+  object-fit:contain;
+}
+
+/* 右侧胶囊按钮 */
+.avatar-sheet-capsule{
+  position:absolute;right:20px;top:50%;transform:translateY(-50%);
+  background:rgba(255,255,255,.9);
+  backdrop-filter:blur(40px);
+  border-radius:34px;
+  padding:16px 10px;
+  display:flex;flex-direction:column;align-items:center;gap:16px;
+  box-shadow:none;
+}
+.avatar-sheet-capsule-item{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  cursor:pointer;
+}
+.avatar-sheet-capsule-item svg{width:20px;height:20px}
+.avatar-sheet-capsule-item span{
+  font-size:11px;color:rgba(0,0,0,.9);font-family:var(--font);
+}
+
+/* OS 内心独白气泡 —— 镜像翻转尖角朝下 */
+.os-bubble{
+  position:absolute;
+  right:calc(55% + 20px);top:calc(50% - 100px);transform:scale(.8) translateX(10px) translateY(-50%) scaleY(-1);
+  max-width:35%;
+  border-image-repeat:stretch;
+  border-style:solid;
+  border-width:0;
+  padding:6px 12px 6px 10px;
+  font-size:13px;line-height:1.4;
+  color:var(--text-primary);
+  opacity:0;
+  transition:opacity .4s ease .3s, transform .4s cubic-bezier(.4,0,.2,1) .3s;
+  background:transparent;border-radius:0;box-shadow:none;
+  display:none;
+  z-index:10;
+}
+.avatar-sheet.show .os-bubble{
+  display:block;
+  opacity:1;transform:scale(1) translateX(0) translateY(-50%) scaleY(-1);
+}
+.os-text{display:block;transform:scaleY(-1);text-align:right}
+/* 气泡B样式 - 尖角朝右（朝人物） */
+[data-bubble="B"] .os-bubble{
+  border-image-source:url('bubbleB-right.png');
+  border-image-slice:75 120 36 84 fill;
+  border-image-width:25px 40px 12px 28px;
+  padding:6px 26px 6px 8px;
+}
+/* 气泡C样式 - 尖角朝右 */
+[data-bubble="C"] .os-bubble{
+  border-image-source:url('bubbleC-right.png');
+  border-image-slice:63 84 66 66 fill;
+  border-image-width:21px 28px 22px 22px;
+  padding:6px 20px 6px 6px;
+}
+
+/* 底部工具栏 */
+.avatar-sheet-toolbar{
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  padding:0 0 20px;
+  position:relative;
+  transform:translateY(-20px);
+}
+.avatar-sheet-toolbar-inner{
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.9);
+  border-radius:32px;
+  width:270px;height:67px;
+  gap:54px;
+  padding:11px 40px;
+  backdrop-filter:blur(5px);
+}
+.avatar-sheet-tool{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  cursor:pointer;width:80px;
+}
+.avatar-sheet-tool svg{width:24px;height:24px}
+.avatar-sheet-tool span{
+  font-size:12px;color:rgba(0,0,0,.9);font-family:var(--font);
+}
+.os-text{display:block}
 </style>
 </head>
 
@@ -618,6 +761,55 @@ body{
   </div>
 
   <div class="home-indicator"></div>
+
+  <!-- ============ 半屏形象面板 ============ -->
+  <div class="avatar-sheet-overlay" id="avatarSheetOverlay"></div>
+  <div class="avatar-sheet" id="avatarSheet">
+    <div class="avatar-sheet-header">
+      <span class="avatar-sheet-title" id="avatarSheetTitle">我的QQ秀</span>
+      <div class="avatar-sheet-close" id="avatarSheetClose">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M2.93 2.93a.567.567 0 01.8 0L8 7.2l4.27-4.27a.567.567 0 01.8.8L8.8 8l4.27 4.27a.567.567 0 01-.8.8L8 8.8l-4.27 4.27a.567.567 0 01-.8-.8L7.2 8 2.93 3.73a.567.567 0 010-.8z" fill="rgba(0,0,0,.6)"/></svg>
+      </div>
+    </div>
+    <div class="avatar-sheet-body">
+      <!-- OS 内心独白气泡 -->
+      <div class="os-bubble" id="osBubble">
+        <span class="os-text" id="osText"></span>
+      </div>
+      <!-- 形象展示 -->
+      <div class="avatar-sheet-figure" id="avatarSheetFigure">
+        <img id="avatarSheetImg" src="" alt="">
+      </div>
+      <!-- 右侧胶囊按钮 -->
+      <div class="avatar-sheet-capsule">
+        <div class="avatar-sheet-capsule-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,.8)" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          <span>123</span>
+        </div>
+        <div class="avatar-sheet-capsule-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,.8)" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <span>展柜</span>
+        </div>
+      </div>
+    </div>
+    <!-- 底部工具栏 -->
+    <div class="avatar-sheet-toolbar">
+      <div class="avatar-sheet-toolbar-inner">
+        <div class="avatar-sheet-tool">
+          <img src="assets/CodeBuddyAssets/1832_93216/3.svg" width="24" height="24">
+          <span>形象</span>
+        </div>
+        <div class="avatar-sheet-tool">
+          <img src="assets/CodeBuddyAssets/1832_93216/4.svg" width="24" height="24">
+          <span>动作</span>
+        </div>
+        <div class="avatar-sheet-tool">
+          <img src="assets/CodeBuddyAssets/1832_93216/5.svg" width="24" height="24">
+          <span>背景</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <p class="hint">QQ Avatar 聊天气泡交互原型</p>
@@ -790,6 +982,7 @@ window.addEventListener('unhandledrejection', function(e) {
   const SELF = {
     name: '古风沙拉酱',
     avatar: '古风_00000_iSpt_small.png',
+    avatarFull: '古风_00000_iSpt.png',
     hasAvatar: true,
     side: 'right',
     voice: { voiceName: 'zh-CN-YunxiNeural', rate: '-5%', pitch: '-2Hz' }
@@ -1509,6 +1702,120 @@ window.addEventListener('unhandledrejection', function(e) {
     `;
     msgList.appendChild(es);
     emptyState = es;
+  });
+
+  /* ============ 半屏形象面板 ============ */
+  const avatarSheet = document.getElementById('avatarSheet');
+  const avatarSheetOverlay = document.getElementById('avatarSheetOverlay');
+  const avatarSheetImg = document.getElementById('avatarSheetImg');
+  const avatarSheetClose = document.getElementById('avatarSheetClose');
+  const osBubble = document.getElementById('osBubble');
+  const osText = document.getElementById('osText');
+
+  /* 记录最近聊天内容用于生成 OS */
+  let recentMessages = [];
+
+  /* OS 内心独白模板 */
+  const OS_TEMPLATES = {
+    'cool-guy': [
+      '（其实刚才那个挺好笑的…但我不能笑）',
+      '（这群人…还挺有意思的）',
+      '（假装很酷其实已经在偷笑了）',
+      '（表面淡定内心疯狂点头）',
+      '（不能让他们看出来我很开心）',
+    ],
+    'chill': [
+      '（好饿…等聊完去吃东西）',
+      '（今天也是平静的一天呢）',
+      '（嗯…他们好像很开心的样子）',
+      '（困了但不好意思说…）',
+    ],
+    'bubbly': [
+      '（啊好开心大家都在！）',
+      '（要不要发个表情包呢…）',
+      '（今天的聊天好有趣！）',
+      '（希望他们也觉得我有意思）',
+    ],
+    'cool': [
+      '（嘻嘻被发现了吗~）',
+      '（今天的氛围好好啊～）',
+      '（其实我刚才想了好久才回的）',
+      '（希望大家都能出去玩！）',
+    ],
+    'sweet': [
+      '（好想跟大家一直聊下去♡）',
+      '（每次聊天都好开心的说～）',
+      '（悄悄截了个图…太可爱了）',
+      '（好幸福有这样的朋友们～）',
+    ],
+  };
+
+  /* 根据最近聊天内容和角色性格生成 OS */
+  function generateOS(member) {
+    const pool = OS_TEMPLATES[member.personality] || OS_TEMPLATES['chill'];
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  let currentSheetMember = null;
+
+  const avatarSheetTitle = document.getElementById('avatarSheetTitle');
+
+  function openAvatarSheet(member) {
+    if (!member || !member.hasAvatar) return;
+    currentSheetMember = member;
+    avatarSheetImg.src = member.avatarFull || member.avatar;
+    avatarSheetImg.alt = member.name;
+    avatarSheetTitle.textContent = (member === SELF) ? '我的QQ秀' : member.name + '的QQ秀';
+    osText.textContent = '';
+    avatarSheet.classList.add('show');
+    avatarSheetOverlay.classList.add('show');
+    /* 打字机效果显示OS */
+    const osContent = generateOS(member);
+    let osIdx = 0;
+    function typeOS() {
+      if (osIdx < osContent.length) {
+        osText.textContent += osContent[osIdx];
+        osIdx++;
+        setTimeout(typeOS, 60);
+      }
+    }
+    setTimeout(typeOS, 500);
+  }
+
+  function closeAvatarSheet() {
+    avatarSheet.classList.remove('show');
+    avatarSheetOverlay.classList.remove('show');
+    currentSheetMember = null;
+  }
+
+  avatarSheetClose.addEventListener('click', closeAvatarSheet);
+  avatarSheetOverlay.addEventListener('click', closeAvatarSheet);
+
+  /* 触摸下滑关闭 */
+  let sheetTouchStartY = 0;
+  avatarSheet.addEventListener('touchstart', (e) => {
+    sheetTouchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  avatarSheet.addEventListener('touchend', (e) => {
+    const dy = e.changedTouches[0].clientY - sheetTouchStartY;
+    if (dy > 80) closeAvatarSheet();
+  });
+
+  /* 点击形象弹出半屏 —— 事件委托在 msgList 上 */
+  msgList.addEventListener('click', (e) => {
+    const avatarEl = e.target.closest('.avatar-character');
+    if (!avatarEl) return;
+    /* 找到对应的 member */
+    const row = avatarEl.closest('.msg-row');
+    if (!row) return;
+    const senderEl = row.querySelector('.sender-name');
+    if (!senderEl) return;
+    const name = senderEl.textContent.trim();
+    /* 查找 member */
+    let member = null;
+    if (name === SELF.name) { member = SELF; }
+    else { member = MEMBERS.find(m => m.name === name); }
+    if (member) openAvatarSheet(member);
   });
 
 })();
