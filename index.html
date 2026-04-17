@@ -982,7 +982,6 @@ window.addEventListener('unhandledrejection', function(e) {
   const SELF = {
     name: '古风沙拉酱',
     avatar: '古风_00000_iSpt_small.png',
-    avatarFull: '古风_00000_iSpt.png',
     hasAvatar: true,
     side: 'right',
     voice: { voiceName: 'zh-CN-YunxiNeural', rate: '-5%', pitch: '-2Hz' }
@@ -1763,7 +1762,7 @@ window.addEventListener('unhandledrejection', function(e) {
   function openAvatarSheet(member) {
     if (!member || !member.hasAvatar) return;
     currentSheetMember = member;
-    avatarSheetImg.src = member.avatarFull || member.avatar;
+    avatarSheetImg.src = member.avatar;
     avatarSheetImg.alt = member.name;
     avatarSheetTitle.textContent = (member === SELF) ? '我的QQ秀' : member.name + '的QQ秀';
     osText.textContent = '';
