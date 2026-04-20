@@ -346,6 +346,24 @@ body{
   padding:8px 19px 8px 14px;
 }
 
+/* ============ 气泡 D（泡泡气泡） ============ */
+[data-bubble="D"] .msg-row.left .has-avatar .bubble{
+  margin-left:-15px;
+  margin-top:-2px;
+  border-image-source:url('bubbleD-left.png');
+  border-image-slice:78 66 66 116 fill;
+  border-image-width:26px 22px 22px 38px;
+  padding:13px 14px 9px 28px;
+}
+[data-bubble="D"] .msg-row.right .has-avatar .bubble{
+  margin-right:-15px;
+  margin-top:-2px;
+  border-image-source:url('bubbleD-right.png');
+  border-image-slice:78 116 66 66 fill;
+  border-image-width:26px 38px 22px 22px;
+  padding:13px 28px 9px 14px;
+}
+
 /* ============ MODERN STYLE (现代风) ============ */
 [data-style="modern"] .bubble{
   background:var(--white);border-radius:21px;
@@ -673,6 +691,13 @@ body{
   border-image-width:21px 28px 22px 22px;
   padding:6px 20px 6px 6px;
 }
+/* 气泡D样式 - 尖角朝右 */
+[data-bubble="D"] .os-bubble{
+  border-image-source:url('bubbleD-right.png');
+  border-image-slice:78 116 66 66 fill;
+  border-image-width:26px 38px 22px 22px;
+  padding:6px 22px 6px 8px;
+}
 
 /* 底部工具栏 */
 .avatar-sheet-toolbar{
@@ -737,6 +762,7 @@ body{
       <div class="style-toggle" id="bubbleStyleToggle">
         <button data-bubble="B">漫画气泡</button>
         <button data-bubble="C" class="active">简约气泡</button>
+        <button data-bubble="D">泡泡气泡</button>
       </div>
     </div>
     <div class="empty-state" id="emptyState">
