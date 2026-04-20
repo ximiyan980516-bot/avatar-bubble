@@ -42,7 +42,7 @@
   /* 气泡弹出（有 Avatar） */
   --bubble-scale-from: 0.7;          /* 气泡初始缩放 */
   --bubble-scale-bounce: 1.02;       /* 气泡弹性最大缩放 */
-  --bubble-duration: 0.25s;          /* 气泡动画时长 */
+  --bubble-duration: 0.4s;          /* 气泡动画时长 */
   --bubble-easing: cubic-bezier(.2,.8,.4,1); /* 气泡缓动曲线 */
 
   /* 气泡弹出（无 Avatar / 蛋黄） */
@@ -268,13 +268,15 @@ body{
   animation:bubble-pop-right var(--bubble-duration) var(--bubble-easing) both;
 }
 @keyframes bubble-pop-left{
-  0%{opacity:0;transform:scale(var(--bubble-scale-from)) translateX(clamp(-45px, -12vw, -28px)) translateY(clamp(-22px, -6vw, -12px))}
-  60%{opacity:1;transform:scale(var(--bubble-scale-bounce)) translateX(0)}
+  0%{opacity:0;transform:scale(var(--bubble-scale-from)) translateX(clamp(-36px, -10vw, -24px)) translateY(clamp(-18px, -5vw, -10px))}
+  25%{opacity:1;transform:scale(var(--bubble-scale-from)) translateX(clamp(-36px, -10vw, -24px)) translateY(clamp(-18px, -5vw, -10px))}
+  70%{opacity:1;transform:scale(var(--bubble-scale-bounce)) translateX(0)}
   100%{opacity:1;transform:scale(1) translateX(0)}
 }
 @keyframes bubble-pop-right{
-  0%{opacity:0;transform:scale(var(--bubble-scale-from)) translateX(clamp(28px, 12vw, 45px)) translateY(clamp(-22px, -6vw, -12px))}
-  60%{opacity:1;transform:scale(var(--bubble-scale-bounce)) translateX(0)}
+  0%{opacity:0;transform:scale(var(--bubble-scale-from)) translateX(clamp(24px, 10vw, 36px)) translateY(clamp(-18px, -5vw, -10px))}
+  25%{opacity:1;transform:scale(var(--bubble-scale-from)) translateX(clamp(24px, 10vw, 36px)) translateY(clamp(-18px, -5vw, -10px))}
+  70%{opacity:1;transform:scale(var(--bubble-scale-bounce)) translateX(0)}
   100%{opacity:1;transform:scale(1) translateX(0)}
 }
 /* No-avatar user bubble: simple fade only */
@@ -374,7 +376,10 @@ body{
   box-shadow:none;
 }
 [data-style="comic"] .has-avatar .bubble[data-emotion="excited"].show{
-  animation:bubble-pop-in .45s cubic-bezier(.175,.885,.32,1.275);
+  animation:bubble-pop-left var(--bubble-duration) var(--bubble-easing) both;
+}
+.msg-row.right .has-avatar .bubble[data-emotion="excited"].show{
+  animation:bubble-pop-right var(--bubble-duration) var(--bubble-easing) both;
 }
 [data-style="modern"] .bubble[data-emotion="excited"]{
   box-shadow:0 2px 12px rgba(0,0,0,.08);
@@ -412,7 +417,12 @@ body{
 [data-style="comic"] .bubble[data-emotion="angry"]{
   box-shadow:none;
 }
-[data-style="comic"] .bubble[data-emotion="angry"].show{animation:shake var(--shake-duration) ease}
+[data-style="comic"] .bubble[data-emotion="angry"].show{
+  animation:bubble-pop-left var(--bubble-duration) var(--bubble-easing) both, shake var(--shake-duration) ease var(--bubble-duration);
+}
+.msg-row.right .bubble[data-emotion="angry"].show{
+  animation:bubble-pop-right var(--bubble-duration) var(--bubble-easing) both, shake var(--shake-duration) ease var(--bubble-duration);
+}
 [data-style="modern"] .bubble[data-emotion="angry"]{
   box-shadow:0 2px 12px rgba(0,0,0,.1);
 }
@@ -693,7 +703,7 @@ body{
 </style>
 </head>
 
-<body data-style="comic" data-bubble="B">
+<body data-style="comic" data-bubble="C">
 
 <!-- ============ PHONE FRAME ============ -->
 <div class="phone-frame">
@@ -725,8 +735,8 @@ body{
     <!-- 气泡样式切换（长按显示） -->
     <div class="bubble-style-popup" id="bubbleStylePopup">
       <div class="style-toggle" id="bubbleStyleToggle">
-        <button data-bubble="B" class="active">漫画气泡</button>
-        <button data-bubble="C">简约气泡</button>
+        <button data-bubble="B">漫画气泡</button>
+        <button data-bubble="C" class="active">简约气泡</button>
       </div>
     </div>
     <div class="empty-state" id="emptyState">
