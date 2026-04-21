@@ -641,22 +641,22 @@ body{
   width:5px;height:5px;
   animation:sleepy-pop 0.6s cubic-bezier(.34,1.56,.64,1) 0s forwards, sleepy-sway 2s ease-in-out 0.6s infinite;
 }
-.msg-row.left .sleepy-mark.z-1{top:4px;right:-12px}
-.msg-row.right .sleepy-mark.z-1{top:4px;left:-12px}
+.msg-row.left .sleepy-mark.z-1{top:4px;right:-2px}
+.msg-row.right .sleepy-mark.z-1{top:4px;left:-2px}
 /* 中Z */
 .sleepy-mark.z-2{
   width:7px;height:7px;
   animation:sleepy-pop 0.6s cubic-bezier(.34,1.56,.64,1) 0.3s forwards, sleepy-sway 2s ease-in-out 0.9s infinite;
 }
-.msg-row.left .sleepy-mark.z-2{top:-6px;right:-18px}
-.msg-row.right .sleepy-mark.z-2{top:-6px;left:-18px}
+.msg-row.left .sleepy-mark.z-2{top:-2px;right:-6px}
+.msg-row.right .sleepy-mark.z-2{top:-2px;left:-6px}
 /* 大Z：最远 */
 .sleepy-mark.z-3{
   width:10px;height:9px;
   animation:sleepy-pop 0.6s cubic-bezier(.34,1.56,.64,1) 0.6s forwards, sleepy-sway 2s ease-in-out 1.2s infinite;
 }
-.msg-row.left .sleepy-mark.z-3{top:-18px;right:-26px}
-.msg-row.right .sleepy-mark.z-3{top:-18px;left:-26px}
+.msg-row.left .sleepy-mark.z-3{top:-10px;right:-11px}
+.msg-row.right .sleepy-mark.z-3{top:-10px;left:-11px}
 .msg-row.right .sleepy-mark{transform-origin:center}
 @keyframes sleepy-pop{
   0%{opacity:0;transform:scale(0.3) translateY(6px) rotate(-20deg)}
@@ -1146,7 +1146,7 @@ body{
 </style>
 </head>
 
-<body data-style="comic" data-bubble="C" data-demo="basic">
+<body data-style="comic" data-bubble="C" data-demo="game">
 
 <!-- ============ PHONE FRAME ============ -->
 <div class="phone-frame">
@@ -1178,8 +1178,8 @@ body{
     <!-- 气泡样式切换（长按显示） -->
     <div class="bubble-style-popup" id="bubbleStylePopup">
       <div class="demo-mode-toggle" id="demoModeToggle">
-        <button data-demo="basic" class="active">基础demo</button>
-        <button data-demo="game">游戏化demo</button>
+        <button data-demo="basic">基础demo</button>
+        <button data-demo="game" class="active">游戏化demo</button>
       </div>
       <div class="style-toggle" id="bubbleStyleToggle">
         <button data-bubble="B">漫画气泡</button>
@@ -1914,13 +1914,14 @@ window.addEventListener('unhandledrejection', function(e) {
       const el = document.createElement('div');
       el.className = 'falling-item';
       el.textContent = emoji;
-      /* 起点：屏幕顶部，接近目标X位置（带随机偏移）*/
+      /* 起点：目标气泡上方 ~180px（不超过消息区域顶部），带随机X偏移 */
+      const maxDropHeight = 180;
       const startX = targetX + (Math.random() - 0.5) * 60;
-      const startY = -30;
+      const startY = Math.max(targetY - maxDropHeight, 0);
       el.style.left = startX + 'px';
       el.style.top = startY + 'px';
       phone.appendChild(el);
-      /* 找出目标气泡上方的其他气泡（可能碰撞的障碍物） */
+      /* 找出目标气泡上方、起点下方的气泡（碰撞范围内） */
       const allBubbles = Array.from(msgListEl.querySelectorAll('.msg-row .bubble'))
         .filter(b => b !== targetBubble)
         .map(b => {
@@ -1932,7 +1933,8 @@ window.addEventListener('unhandledrejection', function(e) {
             w: r.width,
             h: r.height,
           };
-        });
+        })
+        .filter(b => b.y > startY && b.y < targetY);
       /* 物理模拟 */
       let x = startX, y = startY;
       let vx = 0, vy = 0;
