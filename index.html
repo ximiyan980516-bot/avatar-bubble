@@ -441,6 +441,38 @@ body{
   33%{transform:rotate(-10deg) scaleX(-1) translateY(-1px)}
   66%{transform:rotate(-14deg) scaleX(-1) translateY(0.5px)}
 }
+/* WoW元素：左侧消息右下角，右侧消息左下角（按Figma尺寸） */
+.sparkle-wow{
+  position:absolute;
+  width:25px;height:22px;
+  background:url('WoW.png') center/contain no-repeat;
+  opacity:0;
+  animation:wow-pop 0.5s cubic-bezier(.34,1.56,.64,1) 0.3s forwards, wow-bounce 1.4s ease-in-out 0.8s infinite;
+}
+.bubble[data-emotion="excited"].show .sparkle-wow{display:block}
+.msg-row.left .sparkle-wow{bottom:-8px;right:-6px}
+.msg-row.right .sparkle-wow{bottom:-8px;left:-6px}
+.msg-row.right .sparkle-wow{
+  animation:wow-pop-r 0.5s cubic-bezier(.34,1.56,.64,1) 0.3s forwards, wow-bounce-r 1.4s ease-in-out 0.8s infinite;
+}
+@keyframes wow-pop{
+  0%{opacity:0;transform:scale(0) rotate(15deg)}
+  60%{opacity:1;transform:scale(1.2) rotate(-20deg)}
+  100%{opacity:1;transform:scale(1) rotate(-13deg)}
+}
+@keyframes wow-pop-r{
+  0%{opacity:0;transform:scale(0) rotate(-15deg) scaleX(-1)}
+  60%{opacity:1;transform:scale(1.2) rotate(20deg) scaleX(-1)}
+  100%{opacity:1;transform:scale(1) rotate(13deg) scaleX(-1)}
+}
+@keyframes wow-bounce{
+  0%,100%{transform:scale(1) translateY(0) rotate(-13deg)}
+  50%{transform:scale(1.08) translateY(-2px) rotate(-10deg)}
+}
+@keyframes wow-bounce-r{
+  0%,100%{transform:scale(1) scaleX(-1) translateY(0) rotate(13deg)}
+  50%{transform:scale(1.08) scaleX(-1) translateY(-2px) rotate(10deg)}
+}
 @keyframes bubble-pop-in{
   0%{transform:scale(0.5) translateX(-4px);opacity:0}
   60%{transform:scale(1.03) translateX(1px);opacity:1}
@@ -587,6 +619,55 @@ body{
   100%{opacity:1;transform:scale(1) translateY(0)}
 }
 
+/* ============ EMOTION: SLEEPY ============ */
+[data-style="comic"] .bubble[data-emotion="sleepy"]{
+  box-shadow:none;
+}
+[data-style="comic"] .has-avatar .bubble[data-emotion="sleepy"].show{
+  animation:bubble-pop-left var(--bubble-duration) var(--bubble-easing) both;
+}
+.msg-row.right .has-avatar .bubble[data-emotion="sleepy"].show{
+  animation:bubble-pop-right var(--bubble-duration) var(--bubble-easing) both;
+}
+.sleepy-marks{display:none;position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;overflow:visible}
+.bubble[data-emotion="sleepy"].show .sleepy-marks{display:block}
+.sleepy-mark{
+  position:absolute;
+  background:url('zzz.svg') center/contain no-repeat;
+  opacity:0;
+}
+/* 小Z：最靠近气泡 */
+.sleepy-mark.z-1{
+  width:5px;height:5px;
+  animation:sleepy-pop 0.6s cubic-bezier(.34,1.56,.64,1) 0s forwards, sleepy-sway 2s ease-in-out 0.6s infinite;
+}
+.msg-row.left .sleepy-mark.z-1{top:4px;right:-12px}
+.msg-row.right .sleepy-mark.z-1{top:4px;left:-12px}
+/* 中Z */
+.sleepy-mark.z-2{
+  width:7px;height:7px;
+  animation:sleepy-pop 0.6s cubic-bezier(.34,1.56,.64,1) 0.3s forwards, sleepy-sway 2s ease-in-out 0.9s infinite;
+}
+.msg-row.left .sleepy-mark.z-2{top:-6px;right:-18px}
+.msg-row.right .sleepy-mark.z-2{top:-6px;left:-18px}
+/* 大Z：最远 */
+.sleepy-mark.z-3{
+  width:10px;height:9px;
+  animation:sleepy-pop 0.6s cubic-bezier(.34,1.56,.64,1) 0.6s forwards, sleepy-sway 2s ease-in-out 1.2s infinite;
+}
+.msg-row.left .sleepy-mark.z-3{top:-18px;right:-26px}
+.msg-row.right .sleepy-mark.z-3{top:-18px;left:-26px}
+.msg-row.right .sleepy-mark{transform-origin:center}
+@keyframes sleepy-pop{
+  0%{opacity:0;transform:scale(0.3) translateY(6px) rotate(-20deg)}
+  60%{opacity:1;transform:scale(1.15) translateY(-3px) rotate(8deg)}
+  100%{opacity:1;transform:scale(1) translateY(0) rotate(0deg)}
+}
+@keyframes sleepy-sway{
+  0%,100%{transform:scale(1) translateY(0) rotate(0deg)}
+  50%{transform:scale(1.03) translateY(-2px) rotate(-5deg)}
+}
+
 /* ============ TYPING CURSOR (隐藏) ============ */
 .typing-cursor{display:none!important}
 
@@ -668,20 +749,249 @@ body{
 .bubble-style-popup{
   position:sticky;top:50%;z-index:50;
   display:none;
-  justify-content:center;
+  flex-direction:column;align-items:center;gap:8px;
   padding:0;margin:-20px auto 0;
   pointer-events:none;
 }
 .bubble-style-popup.show{
   display:flex;
 }
-.bubble-style-popup .style-toggle{
+.bubble-style-popup .style-toggle,
+.bubble-style-popup .demo-mode-toggle{
   pointer-events:auto;
   box-shadow:0 4px 16px rgba(0,0,0,.12);
   background:rgba(255,255,255,.95);
   backdrop-filter:blur(12px);
   border-radius:10px;
   padding:3px;
+  display:flex;
+}
+.demo-mode-toggle button{
+  padding:6px 14px;border:none;cursor:pointer;
+  font-size:11px;font-weight:600;font-family:var(--font);
+  color:var(--text-secondary);background:transparent;
+  border-radius:8px;transition:all .25s;
+}
+.demo-mode-toggle button.active{
+  background:linear-gradient(135deg,#6B5BFF 0%,#8B5CF6 100%);
+  color:#fff;
+  box-shadow:0 2px 8px rgba(107,91,255,.4);
+}
+
+/* ============ 游戏化 Demo ============ */
+/* 物品物理下落 */
+.falling-item{
+  position:absolute;
+  font-size:24px;line-height:1;
+  width:24px;height:24px;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+  z-index:60;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.2));
+  will-change:transform,left,top;
+  user-select:none;
+}
+.falling-item.item-landed{
+  position:absolute;
+  z-index:5;
+  animation:item-sway 2.5s ease-in-out infinite;
+  transform-origin:bottom center;
+}
+/* 被碰撞的气泡抖动 */
+[data-demo="game"] .msg-row .bubble.bubble-hit{
+  animation:bubble-hit-shake 0.4s cubic-bezier(.36,.07,.19,.97) both !important;
+}
+@keyframes bubble-hit-shake{
+  0%,100%{transform:translate(0,0) rotate(0)}
+  20%{transform:translate(-3px,1px) rotate(-1deg)}
+  40%{transform:translate(3px,-1px) rotate(1deg)}
+  60%{transform:translate(-2px,2px) rotate(-0.5deg)}
+  80%{transform:translate(2px,0) rotate(0.5deg)}
+}
+@keyframes item-sway{
+  0%,100%{transform:rotate(0deg) translateY(0)}
+  50%{transform:rotate(-6deg) translateY(-2px)}
+}
+
+/* 气泡共鸣 —— 全屏鬼畜气泡特效 */
+.resonance-fx{
+  position:absolute;inset:0;
+  pointer-events:none;z-index:90;
+  overflow:hidden;
+}
+.rfx-bubble-wrap{
+  position:absolute;bottom:-80px;
+  opacity:0;
+  animation:rfx-fly 2.8s cubic-bezier(.4,0,.2,1) both;
+  transform-origin:center;
+}
+.rfx-bubble-wrap .msg-row{
+  min-height:auto !important;
+  opacity:1 !important;
+}
+.rfx-bubble-wrap .bubble{
+  animation:none !important;
+  max-width:180px;
+  white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;
+  transform:none !important;opacity:1 !important;
+}
+@keyframes rfx-fly{
+  0%{
+    transform:translateY(0) translateX(0) rotate(var(--rot,0deg)) scale(var(--s,1));
+    opacity:0;
+  }
+  8%{opacity:1}
+  85%{opacity:1}
+  100%{
+    transform:translateY(-120vh) translateX(var(--drift,0)) rotate(var(--rot-end,30deg)) scale(var(--s,1));
+    opacity:0;
+  }
+}
+
+/* 空间队列效果已移除 */
+
+/* 对话角力：场上唯一王者带红光晕，其他被压制 */
+[data-demo="game"] .msg-row.angry-king{
+  z-index:20;position:relative;
+}
+[data-demo="game"] .msg-row.angry-king .bubble{
+  transform:scale(1.2) !important;
+  filter:drop-shadow(0 0 12px rgba(255,80,80,.7)) drop-shadow(0 0 24px rgba(255,80,80,.4));
+  transition:transform .5s cubic-bezier(.34,1.56,.64,1), filter .5s ease;
+  animation:angry-king-pulse 1.2s ease-in-out infinite, angry-king-shake 0.6s cubic-bezier(.34,1.56,.64,1) both !important;
+  position:relative;
+}
+@keyframes angry-king-pulse{
+  0%,100%{filter:drop-shadow(0 0 12px rgba(255,80,80,.7)) drop-shadow(0 0 24px rgba(255,80,80,.4))}
+  50%{filter:drop-shadow(0 0 18px rgba(255,80,80,.9)) drop-shadow(0 0 32px rgba(255,80,80,.6))}
+}
+@keyframes angry-king-shake{
+  0%{transform:scale(1)}
+  20%{transform:scale(1.25) rotate(-2deg)}
+  40%{transform:scale(1.35) rotate(2deg)}
+  60%{transform:scale(1.3) rotate(-1deg)}
+  80%{transform:scale(1.22) rotate(1deg)}
+  100%{transform:scale(1.2)}
+}
+/* 冲击波 */
+[data-demo="game"] .msg-row.angry-king::before{
+  content:'';position:absolute;
+  left:50%;top:50%;width:20px;height:20px;
+  border:3px solid rgba(255,80,80,.6);
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  animation:shockwave 0.8s ease-out forwards;
+  pointer-events:none;z-index:15;
+}
+@keyframes shockwave{
+  0%{width:20px;height:20px;opacity:0.8;border-width:3px}
+  100%{width:320px;height:320px;opacity:0;border-width:1px}
+}
+/* 败者：整体缩小+被推远，保持内部相对位置 */
+[data-demo="game"] .msg-row.angry-loser{
+  animation:angry-loser-push 0.8s cubic-bezier(.4,0,.2,1) forwards !important;
+  transform-origin:left center;
+  filter:grayscale(0.6) brightness(0.85) opacity(0.6);
+  transition:filter .6s ease;
+}
+.msg-row.right.angry-loser{
+  transform-origin:right center;
+  animation:angry-loser-push-right 0.8s cubic-bezier(.4,0,.2,1) forwards !important;
+}
+@keyframes angry-loser-push{
+  0%{transform:translateX(0) scale(1)}
+  30%{transform:translateX(-4px) scale(0.9)}
+  60%{transform:translateX(-8px) scale(0.78)}
+  85%{transform:translateX(-9px) scale(0.72)}
+  100%{transform:translateX(-10px) scale(0.7)}
+}
+@keyframes angry-loser-push-right{
+  0%{transform:translateX(0) scale(1)}
+  30%{transform:translateX(4px) scale(0.9)}
+  60%{transform:translateX(8px) scale(0.78)}
+  85%{transform:translateX(9px) scale(0.72)}
+  100%{transform:translateX(10px) scale(0.7)}
+}
+
+/* 阵营投票 */
+/* 阵营投票：顶部计分条 */
+.faction-scoreboard{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:8px 14px;
+  background:linear-gradient(90deg,rgba(107,91,255,.12) 0%,rgba(255,255,255,.6) 50%,rgba(236,72,153,.12) 100%);
+  border-bottom:1px solid var(--border);
+  font-size:13px;font-weight:600;
+  position:relative;
+  animation:fsb-slide-down .4s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes fsb-slide-down{
+  0%{transform:translateY(-100%);opacity:0}
+  100%{transform:translateY(0);opacity:1}
+}
+.faction-scoreboard .side-a,.faction-scoreboard .side-b{
+  display:flex;align-items:center;gap:6px;
+  padding:2px 10px;border-radius:12px;
+  background:rgba(255,255,255,.7);
+}
+.faction-scoreboard .side-a{color:#6B5BFF}
+.faction-scoreboard .side-b{color:#EC4899}
+.faction-scoreboard .dot{
+  width:8px;height:8px;border-radius:50%;
+}
+.faction-scoreboard .side-a .dot{background:#6B5BFF;box-shadow:0 0 6px rgba(107,91,255,.5)}
+.faction-scoreboard .side-b .dot{background:#EC4899;box-shadow:0 0 6px rgba(236,72,153,.5)}
+.faction-scoreboard .count{
+  font-weight:800;font-size:14px;
+  min-width:14px;text-align:center;
+}
+.faction-scoreboard .vs{
+  font-weight:900;color:var(--gray-500);font-size:12px;
+  animation:vs-pulse 1.2s ease-in-out infinite;
+}
+@keyframes vs-pulse{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.15)}
+}
+.faction-scoreboard .fsb-close{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  width:20px;height:20px;line-height:18px;text-align:center;
+  border-radius:50%;background:rgba(0,0,0,.08);
+  cursor:pointer;font-size:14px;color:var(--gray-600);
+  transition:background .2s;
+}
+.faction-scoreboard .fsb-close:hover{background:rgba(0,0,0,.15)}
+
+/* 消息分阵营显示：整体缩小并靠边，保留内部布局 */
+[data-demo="game"] .msg-row.faction-a{
+  align-self:flex-start;
+  display:inline-flex;
+  transform-origin:left center;
+  transform:scale(0.8);
+  background:linear-gradient(90deg,rgba(107,91,255,.12) 0%,transparent 60%);
+  border-left:3px solid rgba(107,91,255,.6);
+  padding-left:4px;
+  border-radius:0 12px 12px 0;
+  animation:faction-msg-in-left .45s cubic-bezier(.34,1.56,.64,1) both;
+}
+[data-demo="game"] .msg-row.faction-b{
+  align-self:flex-end;
+  display:inline-flex;
+  transform-origin:right center;
+  transform:scale(0.8);
+  background:linear-gradient(90deg,transparent 40%,rgba(236,72,153,.12) 100%);
+  border-right:3px solid rgba(236,72,153,.6);
+  padding-right:4px;
+  border-radius:12px 0 0 12px;
+  animation:faction-msg-in-right .45s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes faction-msg-in-left{
+  0%{transform:translateX(-30px) scale(.6);opacity:0}
+  100%{transform:translateX(0) scale(.8);opacity:1}
+}
+@keyframes faction-msg-in-right{
+  0%{transform:translateX(30px) scale(.6);opacity:0}
+  100%{transform:translateX(0) scale(.8);opacity:1}
 }
 
 /* ============ 半屏形象面板 ============ */
@@ -836,7 +1146,7 @@ body{
 </style>
 </head>
 
-<body data-style="comic" data-bubble="C">
+<body data-style="comic" data-bubble="C" data-demo="basic">
 
 <!-- ============ PHONE FRAME ============ -->
 <div class="phone-frame">
@@ -867,6 +1177,10 @@ body{
   <div class="msg-list" id="msgList">
     <!-- 气泡样式切换（长按显示） -->
     <div class="bubble-style-popup" id="bubbleStylePopup">
+      <div class="demo-mode-toggle" id="demoModeToggle">
+        <button data-demo="basic" class="active">基础demo</button>
+        <button data-demo="game">游戏化demo</button>
+      </div>
       <div class="style-toggle" id="bubbleStyleToggle">
         <button data-bubble="B">漫画气泡</button>
         <button data-bubble="C" class="active">简约气泡</button>
@@ -1169,6 +1483,12 @@ window.addEventListener('unhandledrejection', function(e) {
           '低调低调',
           '嗯...',
         ],
+        sleepy: [
+          '你也困了？',
+          '一起睡 晚安',
+          '嗯 睡了',
+          '早点休息',
+        ],
         neutral: [
           '行 没问题',
           '可以 随时',
@@ -1212,6 +1532,12 @@ window.addEventListener('unhandledrejection', function(e) {
           '撒狗粮了',
           '嘿嘿',
           '羡慕了',
+        ],
+        sleepy: [
+          '我也困死了',
+          '洗洗睡吧',
+          '晚安～',
+          'zzz',
         ],
         neutral: [
           '加我一个加我一个',
@@ -1257,6 +1583,12 @@ window.addEventListener('unhandledrejection', function(e) {
           '啊啊啊磕到了',
           '我也爱你们！',
           '甜死了～',
+        ],
+        sleepy: [
+          '困困困～',
+          '我也要睡了',
+          '晚安晚安～',
+          '睡觉觉了',
         ],
         neutral: [
           '收到～',
@@ -1305,6 +1637,12 @@ window.addEventListener('unhandledrejection', function(e) {
           '我也要恋爱！(╥_╥)',
           '太甜了叭～羡慕嫉妒',
         ],
+        sleepy: [
+          '我也困到不行(´-ω-`)',
+          '好累啊 睡了睡了～',
+          '晚安姐妹们 明天见',
+          '呜呜呜想睡觉了',
+        ],
         neutral: [
           '+1+1',
           '了解了～',
@@ -1349,6 +1687,12 @@ window.addEventListener('unhandledrejection', function(e) {
           '啊啊啊磕死我了！',
           '甜蜜蜜～mua！',
         ],
+        sleepy: [
+          '呜呜呜好困好困(｡-ω-)zzz',
+          '晚安啦宝贝们～',
+          '本小姐要睡美容觉啦♡',
+          '困困睡觉觉～',
+        ],
         neutral: [
           '嗯嗯好哒~(◕ᴗ◕✿)',
           '收到收到♪',
@@ -1366,9 +1710,11 @@ window.addEventListener('unhandledrejection', function(e) {
     const excitedWords = ['哈哈','太好了','冲冲冲','开心','好棒','太棒','耶','！！','!!','awsl','绝了','好耶','万岁','啦啦啦','666','nice','好开心','激动','兴奋','哇','想去','一起','出发','走起','期待'];
     const angryWords = ['生气','愤怒','气死','烦死','讨厌','可恶','混蛋','去你的','滚','怒','火大','不爽','靠','我擦','无语','离谱','过分','烦','恶心','讨厌'];
     const loveWords = ['爱你','喜欢你','么么','mua','亲亲','爱了','心动','好爱','太爱','暗恋','表白','恋爱','甜蜜','♡','❤','想你','抱抱','宝贝'];
+    const sleepyWords = ['困了','困死','好困','睡觉','睡了','zzz','ZZZ','zZ','累死','好累','熬夜','打哈欠','哈欠','想睡','晚安','洗洗睡','床上见','早点睡'];
     const confusedWords = ['什么','为啥','不懂','？？','??','看不懂','怎么回事','啥意思','为什么','咋回事','搞不懂','迷惑','疑惑','谁','哪里','怎么','咋','啥','蒙了','懵'];
     const lowerText = text.toLowerCase();
     for (const w of angryWords) { if (lowerText.includes(w)) return 'angry'; }
+    for (const w of sleepyWords) { if (lowerText.includes(w)) return 'sleepy'; }
     for (const w of loveWords) { if (lowerText.includes(w)) return 'love'; }
     for (const w of confusedWords) { if (lowerText.includes(w)) return 'confused'; }
     for (const w of excitedWords) { if (lowerText.includes(w)) return 'excited'; }
@@ -1516,6 +1862,363 @@ window.addEventListener('unhandledrejection', function(e) {
     addTimeout(() => { if (callback) callback(); }, 400);
   }
 
+  /* ============ 游戏化 Demo 核心模块 ============ */
+  const GameMode = {
+    /* 物品映射：关键词 → emoji */
+    items: [
+      { keys: ['咖啡','美式','拿铁','latte','coffee'], emoji: '☕' },
+      { keys: ['猫','喵','kitty','cat'], emoji: '🐱' },
+      { keys: ['狗','汪','puppy','dog'], emoji: '🐶' },
+      { keys: ['礼物','生日','gift'], emoji: '🎁' },
+      { keys: ['蛋糕','cake'], emoji: '🍰' },
+      { keys: ['花','玫瑰','flower'], emoji: '🌹' },
+      { keys: ['啤酒','喝酒','干杯','beer'], emoji: '🍺' },
+      { keys: ['火锅','麻辣'], emoji: '🍲' },
+      { keys: ['奶茶','珍珠奶茶'], emoji: '🧋' },
+      { keys: ['烧烤','bbq'], emoji: '🍖' },
+      { keys: ['披萨','pizza'], emoji: '🍕' },
+      { keys: ['汉堡','burger'], emoji: '🍔' },
+      { keys: ['冰淇淋','雪糕'], emoji: '🍦' },
+      { keys: ['音乐','唱歌','听歌'], emoji: '🎵' },
+      { keys: ['电影','看片','影院'], emoji: '🎬' },
+      { keys: ['游戏','玩游戏','打游戏'], emoji: '🎮' },
+      { keys: ['书','阅读','看书'], emoji: '📚' },
+      { keys: ['睡觉','困','zzz'], emoji: '😴' },
+      { keys: ['下雨','雨'], emoji: '☔' },
+      { keys: ['太阳','晴天'], emoji: '☀️' },
+      { keys: ['钱','工资','发财'], emoji: '💰' },
+      { keys: ['心','爱心','love'], emoji: '💗' },
+      { keys: ['月亮','晚上'], emoji: '🌙' },
+      { keys: ['星星','星空'], emoji: '⭐' },
+    ],
+    detectItem(text) {
+      const lower = text.toLowerCase();
+      for (const it of this.items) {
+        for (const k of it.keys) { if (lower.includes(k)) return it.emoji; }
+      }
+      return null;
+    },
+
+    /* 物品物理下落：从屏幕顶部落下，碰撞上方气泡反弹，最终粘到目标气泡 */
+    dropItem(emoji, targetBubble) {
+      if (!emoji || !targetBubble) return;
+      const phone = document.querySelector('.phone-frame');
+      const msgListEl = document.getElementById('msgList');
+      if (!phone || !msgListEl) return;
+      const phoneRect = phone.getBoundingClientRect();
+      const targetRect = targetBubble.getBoundingClientRect();
+      /* 目标气泡在phone内的相对位置（顶部中心） */
+      const targetX = targetRect.left - phoneRect.left + targetRect.width / 2;
+      const targetY = targetRect.top - phoneRect.top - 4;
+      /* 创建掉落元素 */
+      const el = document.createElement('div');
+      el.className = 'falling-item';
+      el.textContent = emoji;
+      /* 起点：屏幕顶部，接近目标X位置（带随机偏移）*/
+      const startX = targetX + (Math.random() - 0.5) * 60;
+      const startY = -30;
+      el.style.left = startX + 'px';
+      el.style.top = startY + 'px';
+      phone.appendChild(el);
+      /* 找出目标气泡上方的其他气泡（可能碰撞的障碍物） */
+      const allBubbles = Array.from(msgListEl.querySelectorAll('.msg-row .bubble'))
+        .filter(b => b !== targetBubble)
+        .map(b => {
+          const r = b.getBoundingClientRect();
+          return {
+            el: b,
+            x: r.left - phoneRect.left,
+            y: r.top - phoneRect.top,
+            w: r.width,
+            h: r.height,
+          };
+        });
+      /* 物理模拟 */
+      let x = startX, y = startY;
+      let vx = 0, vy = 0;
+      const gravity = 0.6;
+      const bounce = 0.5; /* 反弹系数 */
+      const friction = 0.85; /* 水平摩擦 */
+      let landed = false;
+      let lastT = performance.now();
+      const hitBubbles = new Set();
+      function step(now) {
+        if (landed) return;
+        const dt = Math.min(32, now - lastT);
+        lastT = now;
+        /* 每帧施加重力 */
+        vy += gravity * (dt / 16);
+        x += vx * (dt / 16);
+        y += vy * (dt / 16);
+        /* 检查是否到达目标气泡 */
+        if (y >= targetY - 4) {
+          y = targetY - 4;
+          landed = true;
+          /* 贴到目标气泡上，作为其子元素（跟随气泡滚动） */
+          el.style.transition = 'transform .2s cubic-bezier(.34,1.56,.64,1)';
+          el.style.transform = 'scale(1.2) rotate(-8deg)';
+          setTimeout(() => {
+            el.style.transform = 'scale(1) rotate(0deg)';
+          }, 200);
+          /* 附加到气泡上，使其随消息滚动 */
+          setTimeout(() => {
+            el.classList.add('item-landed');
+            el.style.left = '';
+            el.style.top = '-20px';
+            el.style.right = '6px';
+            el.style.transform = '';
+            el.style.transition = '';
+            if (!targetBubble.style.position) targetBubble.style.position = 'relative';
+            targetBubble.appendChild(el);
+          }, 400);
+          return;
+        }
+        /* 碰撞检测：上方气泡 */
+        for (const b of allBubbles) {
+          if (hitBubbles.has(b.el)) continue;
+          const itemW = 24, itemH = 24;
+          if (x + itemW > b.x && x < b.x + b.w &&
+              y + itemH > b.y && y < b.y + b.h) {
+            /* 命中气泡顶部：反弹 */
+            hitBubbles.add(b.el);
+            vy = -Math.abs(vy) * bounce;
+            /* 给水平一个推力（偏向目标方向） */
+            const dir = targetX > x ? 1 : -1;
+            vx += dir * (1 + Math.random());
+            /* 被撞气泡产生抖动反馈 */
+            b.el.classList.add('bubble-hit');
+            setTimeout(() => b.el.classList.remove('bubble-hit'), 400);
+            /* 让物品离开气泡上方一点防止反复碰撞 */
+            y = b.y - itemH - 1;
+            break;
+          }
+        }
+        vx *= friction;
+        /* 限制掉出屏幕 */
+        if (x < 0) { x = 0; vx = Math.abs(vx); }
+        if (x > phoneRect.width - 24) { x = phoneRect.width - 24; vx = -Math.abs(vx); }
+        /* 超时保护 */
+        if (y > phoneRect.height + 50) { el.remove(); return; }
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    },
+
+    /* 共鸣检测：最近3条是否内容相似 */
+    recentTexts: [], /* {text, normalized, senderName, avatar, rowEl} */
+    normalize(t) {
+      return t.replace(/[\s,.!?！？。，、~～]+/g,'').toLowerCase();
+    },
+    pushText(entry) {
+      this.recentTexts.push(entry);
+      if (this.recentTexts.length > 5) this.recentTexts.shift();
+      return this.checkResonance();
+    },
+    checkResonance() {
+      const n = this.recentTexts.length;
+      if (n < 3) return null;
+      const last3 = this.recentTexts.slice(-3);
+      const norm = last3[0].normalized;
+      if (!norm || norm.length < 1) return null;
+      const senders = new Set(last3.map(e=>e.senderName));
+      if (senders.size < 3) return null;
+      const allSame = last3.every(e => e.normalized === norm);
+      if (!allSame) return null;
+      return last3;
+    },
+    createResonance(last3) {
+      const text = last3[0].text;
+      const count = 18;
+      const phone = document.querySelector('.phone-frame');
+      if (!phone) return;
+      let fx = document.getElementById('resonanceFx');
+      if (fx) fx.remove();
+      fx = document.createElement('div');
+      fx.id = 'resonanceFx';
+      fx.className = 'resonance-fx';
+      /* 生成N个真实气泡（继承当前气泡样式） */
+      for (let i = 0; i < count; i++) {
+        const wrap = document.createElement('div');
+        wrap.className = 'rfx-bubble-wrap';
+        /* 随机方向：一半左侧气泡样式，一半右侧气泡样式 */
+        const side = i % 2 === 0 ? 'left' : 'right';
+        wrap.innerHTML = `
+          <div class="msg-row ${side}" style="display:flex;pointer-events:none">
+            <div class="bubble-wrap has-avatar">
+              <div class="bubble show" data-emotion="neutral">${text}</div>
+            </div>
+          </div>
+        `;
+        const size = 0.7 + Math.random() * 0.7;
+        const leftPct = Math.random() * 80;
+        const delay = Math.random() * 0.6;
+        const dur = 2.2 + Math.random() * 1.3;
+        const rot = (Math.random() - 0.5) * 30;
+        const rotEnd = (Math.random() - 0.5) * 60;
+        const drift = (Math.random() - 0.5) * 100;
+        wrap.style.cssText = `
+          left:${leftPct}%;
+          animation-delay:${delay}s;
+          animation-duration:${dur}s;
+          --s:${size};
+          --rot:${rot}deg;
+          --rot-end:${rotEnd}deg;
+          --drift:${drift}px;
+        `;
+        fx.appendChild(wrap);
+      }
+      phone.appendChild(fx);
+      setTimeout(() => { if (fx.parentNode) fx.remove(); }, 4500);
+      this.recentTexts = [];
+    },
+
+    /* 空间队列：更新活跃状态 */
+    updateSpatial(newRow) {
+      const rows = msgList.querySelectorAll('.msg-row');
+      rows.forEach((r, i) => {
+        r.classList.remove('active-front','active-back');
+        if (r === newRow) r.classList.add('active-front');
+        else if (i < rows.length - 3) r.classList.add('active-back');
+      });
+    },
+
+    /* 对话角力：相邻两个有形象用户的愤怒气泡才对战 */
+    applyAngryPush(newRow, emotion, member, text) {
+      if (emotion !== 'angry') return;
+      if (!member || !member.hasAvatar) return;
+      /* 找上一条相邻的msg-row */
+      const rows = Array.from(msgList.querySelectorAll('.msg-row'));
+      const idx = rows.indexOf(newRow);
+      if (idx < 1) return; /* 没有前一条，不触发 */
+      const prev = rows[idx - 1];
+      /* 前一条必须也是有形象 + 愤怒 */
+      if (!prev.querySelector('.avatar-character')) return;
+      const prevBubble = prev.querySelector('.bubble');
+      if (!prevBubble || prevBubble.getAttribute('data-emotion') !== 'angry') return;
+      /* 计算两者力量，决定王者 */
+      const newPower = (text ? text.length : 1) * 10 + Math.floor(Math.random() * 30);
+      const prevPower = prev._angryPower || ((prev.querySelector('.bubble-text')?.textContent?.length || 1) * 10);
+      newRow._angryPower = newPower;
+      /* 清理之前的状态 */
+      rows.forEach(r => r.classList.remove('angry-king','angry-loser'));
+      if (newPower >= prevPower) {
+        newRow.classList.add('angry-king');
+        prev.classList.add('angry-loser');
+      } else {
+        prev.classList.add('angry-king');
+        newRow.classList.add('angry-loser');
+      }
+      /* 记录当前对战双方，用于清场 */
+      this._angryRivals = [newRow, prev];
+      clearTimeout(this._angryClearTimer);
+      this._angryClearTimer = setTimeout(() => {
+        if (this._angryRivals) {
+          this._angryRivals.forEach(r => {
+            if (r) r.classList.remove('angry-king','angry-loser');
+          });
+        }
+        this._angryRivals = null;
+      }, 6000);
+    },
+
+    /* 阵营投票：检测"A还是B"句式 */
+    activeFaction: null, /* { optA, optB, countA, countB, scoreboard } */
+    detectFaction(text) {
+      const patterns = [
+        /(.{1,6})还是(.{1,6})[?？]?$/,
+        /(.{1,6})or(.{1,6})[?？]?$/i,
+        /选(.{1,6})还是(.{1,6})/,
+      ];
+      for (const p of patterns) {
+        const m = text.match(p);
+        if (m) {
+          const a = m[1].trim().replace(/[?？.,。，是选]/g,'');
+          const b = m[2].trim().replace(/[?？.,。，]/g,'');
+          if (a && b && a.length <= 6 && b.length <= 6 && a !== b) {
+            return { optA: a, optB: b };
+          }
+        }
+      }
+      return null;
+    },
+    startFaction(optA, optB) {
+      /* 清理旧面板 */
+      const old = document.getElementById('factionScoreboard');
+      if (old) old.remove();
+      this.activeFaction = { optA, optB, countA: 0, countB: 0 };
+      /* 创建计分条（chat-header 下方） */
+      const bar = document.createElement('div');
+      bar.id = 'factionScoreboard';
+      bar.className = 'faction-scoreboard';
+      bar.innerHTML = `
+        <span class="side-a">
+          <span class="dot"></span>
+          <span class="label">${optA}</span>
+          <span class="count" id="fsbCountA">0</span>
+        </span>
+        <span class="vs">VS</span>
+        <span class="side-b">
+          <span class="count" id="fsbCountB">0</span>
+          <span class="label">${optB}</span>
+          <span class="dot"></span>
+        </span>
+        <span class="fsb-close" id="fsbClose">×</span>
+      `;
+      const chatHeader = document.querySelector('.chat-header');
+      if (chatHeader && chatHeader.parentNode) {
+        chatHeader.parentNode.insertBefore(bar, chatHeader.nextSibling);
+      }
+      const closeBtn = document.getElementById('fsbClose');
+      if (closeBtn) closeBtn.onclick = () => { this.endFaction(); };
+      /* 超时自动关闭 */
+      clearTimeout(this._factionTimer);
+      this._factionTimer = setTimeout(() => this.endFaction(), 60000);
+    },
+    endFaction() {
+      this.activeFaction = null;
+      const bar = document.getElementById('factionScoreboard');
+      if (bar) bar.remove();
+      /* 清除所有消息的faction标记 */
+      document.querySelectorAll('.msg-row.faction-a, .msg-row.faction-b').forEach(r => {
+        r.classList.remove('faction-a','faction-b');
+      });
+    },
+    /* 给消息应用阵营（根据回复文本决定） */
+    assignFactionToRow(row, replyText, preAssignedSide) {
+      if (!this.activeFaction || !row) return;
+      let side = preAssignedSide;
+      if (!side) {
+        const lower = replyText.toLowerCase();
+        const aMatch = lower.includes(this.activeFaction.optA.toLowerCase());
+        const bMatch = lower.includes(this.activeFaction.optB.toLowerCase());
+        if (aMatch && !bMatch) side = 'a';
+        else if (bMatch && !aMatch) side = 'b';
+        else {
+          /* 如果没明确，根据票数平衡分配，票少的一边优先 */
+          if (this.activeFaction.countA < this.activeFaction.countB) side = 'a';
+          else if (this.activeFaction.countB < this.activeFaction.countA) side = 'b';
+          else side = Math.random() < 0.5 ? 'a' : 'b';
+        }
+      }
+      if (side === 'a') {
+        row.classList.add('faction-a');
+        this.activeFaction.countA++;
+        const el = document.getElementById('fsbCountA');
+        if (el) el.textContent = this.activeFaction.countA;
+      } else {
+        row.classList.add('faction-b');
+        this.activeFaction.countB++;
+        const el = document.getElementById('fsbCountB');
+        if (el) el.textContent = this.activeFaction.countB;
+      }
+    },
+  };
+
+  /* 当前Demo模式 */
+  function isGameMode() { return document.body.getAttribute('data-demo') === 'game'; }
+
   /* ============ 创建消息 DOM ============ */
   function createMessageEl(member, text, emotion, side) {
     msgCounter++;
@@ -1531,17 +2234,23 @@ window.addEventListener('unhandledrejection', function(e) {
     let angerHTML = '';
     let confusedHTML = '';
     let loveHTML = '';
+    let sleepyHTML = '';
     if (emotion === 'excited') {
-      sparklesHTML = '<div class="sparkles"><span class="sparkle"></span></div>';
+      sparklesHTML = '<div class="sparkles"><span class="sparkle"></span><span class="sparkle-wow"></span></div>';
     } else if (emotion === 'angry') {
       angerHTML = '<div class="anger-marks"><span class="anger-mark anger-icon"><img src="愤怒.png" alt=""></span><span class="anger-mark anger-exclaim"><img src="生气感叹号.png" alt=""></span></div>';
     } else if (emotion === 'confused') {
       confusedHTML = '<div class="confused-marks"><span class="confused-mark confused-questions"><img src="3个问号.png" alt=""></span><span class="confused-mark confused-red"><img src="红色问号.png" alt=""></span></div>';
     } else if (emotion === 'love') {
       loveHTML = '<div class="love-marks"><span class="love-mark love-1"><img src="左1爱心.png" alt=""></span><span class="love-mark love-2"><img src="左2爱心.png" alt=""></span><span class="love-mark love-3"><img src="右1爱心.png" alt=""></span></div>';
+    } else if (emotion === 'sleepy') {
+      sleepyHTML = '<div class="sleepy-marks"><span class="sleepy-mark z-1"></span><span class="sleepy-mark z-2"></span><span class="sleepy-mark z-3"></span></div>';
     }
 
     const nameAlign = side === 'right' ? 'text-align:right' : '';
+
+    /* 游戏化：检测物品，物理下落（仅有形象用户） */
+    const itemEmoji = (isGameMode() && member.hasAvatar) ? GameMode.detectItem(text) : null;
 
     if (member.hasAvatar) {
       const avatarImg = (emotion === 'angry' && member.avatar2) ? member.avatar2 : member.avatar;
@@ -1560,7 +2269,7 @@ window.addEventListener('unhandledrejection', function(e) {
           <span class="sender-name" style="${nameAlign}">${member.name}</span>
           <div class="bubble" data-emotion="${emotion}" id="${bubbleId}">
             <span class="bubble-text"></span>
-            ${sparklesHTML}${angerHTML}${confusedHTML}${loveHTML}
+            ${sparklesHTML}${angerHTML}${confusedHTML}${loveHTML}${sleepyHTML}
           </div>
         </div>
       `;
@@ -1578,15 +2287,43 @@ window.addEventListener('unhandledrejection', function(e) {
       `;
     }
 
-    return { row, bubbleId, avatarId, hasAvatar: member.hasAvatar, text, voice: member.voice };
+    return { row, bubbleId, avatarId, hasAvatar: member.hasAvatar, text, voice: member.voice, member, emotion, itemEmoji };
   }
 
   /* ============ 动画播放单条消息 ============ */
   function animateMessage(msgData, callback, skipSpeak) {
-    const { row, bubbleId, avatarId, hasAvatar, text, voice } = msgData;
+    const { row, bubbleId, avatarId, hasAvatar, text, voice, member, emotion, itemEmoji, factionSide } = msgData;
 
     msgList.appendChild(row);
     if (emptyState) emptyState.style.display = 'none';
+
+    /* 游戏化：检查气泡共鸣（推入后若成立则合并） */
+    if (isGameMode() && member) {
+      const entry = {
+        text, normalized: GameMode.normalize(text),
+        senderName: member.name, avatar: member.avatar, member, rowEl: row
+      };
+      const resonance = GameMode.pushText(entry);
+      if (resonance) {
+        /* 延迟执行，等当前row加入后再合并 */
+        setTimeout(() => GameMode.createResonance(resonance), 100);
+      }
+      /* 角力 */
+      if (emotion === 'angry') {
+        setTimeout(() => GameMode.applyAngryPush(row, emotion, member, text), 100);
+      }
+      /* 阵营标记：仅给左侧消息（群成员回复） */
+      if (GameMode.activeFaction && row.classList.contains('left')) {
+        setTimeout(() => GameMode.assignFactionToRow(row, text, factionSide), 50);
+      }
+      /* 物品下落：等气泡显示后触发 */
+      if (itemEmoji) {
+        setTimeout(() => {
+          const b = row.querySelector('.bubble');
+          if (b) GameMode.dropItem(itemEmoji, b);
+        }, 600);
+      }
+    }
 
     /* 直接从 row 内部查找 bubble，避免 getElementById 查不到 */
     const bubbleEl = row.querySelector('.bubble');
@@ -1705,6 +2442,13 @@ window.addEventListener('unhandledrejection', function(e) {
   function generateReplies(userText) {
     const emotion = detectEmotion(userText);
 
+    /* 游戏化模式：复读触发检测 */
+    const gameMode = isGameMode();
+    const REPEAT_TRIGGERS = ['+1','复读','同意','赞同','666','好的','收到','确实','对对对','真的','是的','yep','ok'];
+    const hasRepeatTrigger = REPEAT_TRIGGERS.some(k => userText.toLowerCase().includes(k.toLowerCase()));
+    /* 游戏化模式下：只有含触发词时才强制复读 */
+    const forceRepeat = gameMode && hasRepeatTrigger;
+
     /* 分组：有形象 vs 普通头像 */
     const avatarMembers = MEMBERS.filter(m => m.hasAvatar);
     const normalMembers = MEMBERS.filter(m => !m.hasAvatar);
@@ -1719,7 +2463,13 @@ window.addEventListener('unhandledrejection', function(e) {
 
     /* 随机再多加 1-2 个（从剩余成员中选） */
     const remaining = MEMBERS.filter(m => !repliers.includes(m)).sort(() => Math.random() - 0.5);
-    const extraCount = Math.random() < 0.4 ? 1 : (Math.random() < 0.7 ? 0 : 2);
+    let extraCount = Math.random() < 0.4 ? 1 : (Math.random() < 0.7 ? 0 : 2);
+    /* 复读模式需要至少3个成员 */
+    if (forceRepeat) extraCount = Math.max(1, extraCount);
+    /* 投票模式需要至少3个成员（保证两边都有人且有热度） */
+    if (gameMode && GameMode.activeFaction && repliers.length + extraCount < 3) {
+      extraCount = 3 - repliers.length;
+    }
     for (let e = 0; e < extraCount && e < remaining.length; e++) {
       repliers.push(remaining[e]);
     }
@@ -1727,10 +2477,48 @@ window.addEventListener('unhandledrejection', function(e) {
     /* 打乱回复顺序 */
     repliers.sort(() => Math.random() - 0.5);
 
+    /* 投票模式：预分配站队，保证两边都有人 */
+    let factionSides = [];
+    if (gameMode && GameMode.activeFaction && repliers.length > 0) {
+      const f = GameMode.activeFaction;
+      /* 确保前两个分别站A和B */
+      for (let i = 0; i < repliers.length; i++) {
+        if (i === 0) {
+          factionSides.push(f.countA <= f.countB ? 'a' : 'b');
+        } else if (i === 1) {
+          factionSides.push(factionSides[0] === 'a' ? 'b' : 'a');
+        } else {
+          factionSides.push(Math.random() < 0.5 ? 'a' : 'b');
+        }
+      }
+    }
+
     const replies = [];
-    for (const member of repliers) {
+    for (let idx = 0; idx < repliers.length; idx++) {
+      const member = repliers[idx];
       let text = '';
       let replyEmotion = emotion;
+
+      /* 游戏化-复读模式：直接复读用户内容 */
+      if (forceRepeat) {
+        text = userText;
+        replies.push({ member, text, emotion: replyEmotion });
+        continue;
+      }
+
+      /* 游戏化-投票模式：按预分配站队发言 */
+      if (gameMode && GameMode.activeFaction && factionSides[idx]) {
+        const f = GameMode.activeFaction;
+        const side = factionSides[idx];
+        const opt = side === 'a' ? f.optA : f.optB;
+        const templates = [
+          `必须${opt}啊`, `当然${opt}`, `${opt}+1`, `我选${opt}`,
+          `${opt}yyds`, `投${opt}一票`, `我站${opt}`, `${opt}无脑冲`,
+        ];
+        text = templates[Math.floor(Math.random() * templates.length)];
+        replies.push({ member, text, emotion: 'excited', factionSide: side });
+        continue;
+      }
 
       /* 先尝试话题匹配 */
       let matched = false;
@@ -1816,8 +2604,9 @@ window.addEventListener('unhandledrejection', function(e) {
   function playReplies(replies, idx) {
     if (idx >= replies.length) return;
 
-    const { member, text, emotion } = replies[idx];
+    const { member, text, emotion, factionSide } = replies[idx];
     const msgData = createMessageEl(member, text, emotion, 'left');
+    if (factionSide) msgData.factionSide = factionSide;
     animateMessage(msgData, () => {
       addTimeout(() => playReplies(replies, idx + 1), REPLY_GAP_MIN + Math.random() * REPLY_GAP_RAND);
     });
@@ -1845,6 +2634,13 @@ window.addEventListener('unhandledrejection', function(e) {
     sendBtn.disabled = true;
 
     animateMessage(msgData, () => {
+      /* 游戏化：检测阵营投票 */
+      if (isGameMode()) {
+        const faction = GameMode.detectFaction(text);
+        if (faction) {
+          GameMode.startFaction(faction.optA, faction.optB);
+        }
+      }
       /* 延迟后触发群成员回复 */
       const delay = REPLY_START_DELAY_MIN + Math.random() * REPLY_START_DELAY_RAND;
       addTimeout(() => {
@@ -1903,6 +2699,7 @@ window.addEventListener('unhandledrejection', function(e) {
     try { sharedAudio.pause(); } catch(e) {}
     msgList.innerHTML = '';
     msgCounter = 0;
+    if (GameMode) { GameMode.recentTexts = []; if (GameMode.endFaction) GameMode.endFaction(); }
     const es = document.createElement('div');
     es.className = 'empty-state';
     es.id = 'emptyState';
@@ -2130,6 +2927,28 @@ window.addEventListener('unhandledrejection', function(e) {
     /* 切换后自动隐藏 */
     setTimeout(() => popup.classList.remove('show'), 300);
   });
+
+  /* Demo 模式切换 */
+  const demoToggle = document.getElementById('demoModeToggle');
+  if (demoToggle) {
+    demoToggle.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-demo]');
+      if (!btn) return;
+      e.stopPropagation();
+      document.body.setAttribute('data-demo', btn.dataset.demo);
+      demoToggle.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      /* 切回基础模式时清理游戏化元素 */
+      if (btn.dataset.demo === 'basic') {
+        document.querySelectorAll('.resonance-fx, .faction-scoreboard, .falling-item').forEach(el => el.remove());
+        document.querySelectorAll('.msg-row').forEach(r => {
+          r.classList.remove('angry-push','angry-squeezed','angry-king','angry-loser','faction-a','faction-b');
+        });
+        if (window.GameMode) GameMode.activeFaction = null;
+      }
+      setTimeout(() => popup.classList.remove('show'), 300);
+    });
+  }
 
   /* 点击其他地方消失 */
   document.addEventListener('click', (e) => {
