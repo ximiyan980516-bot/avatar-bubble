@@ -502,6 +502,11 @@ body{
 .confused-mark.confused-red img{width:10px;height:16px}
 .msg-row.left .confused-mark.confused-red img{transform:rotate(-15deg)}
 .msg-row.right .confused-mark.confused-red img{transform:rotate(15deg) scaleX(-1)}
+/* 泡泡气泡(D)疑惑粒子位置补偿 */
+[data-bubble="D"] .msg-row.left .confused-mark.confused-red{left:9px}
+[data-bubble="D"] .msg-row.right .confused-mark.confused-red{right:9px}
+[data-bubble="D"] .msg-row.left .confused-mark.confused-questions{top:-7px}
+[data-bubble="D"] .msg-row.right .confused-mark.confused-questions{top:-7px}
 @keyframes confused-pop{
   0%{opacity:0;transform:scale(0) translateY(4px)}
   30%{opacity:1;transform:scale(1.1) translateY(-2px)}
