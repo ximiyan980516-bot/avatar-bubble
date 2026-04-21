@@ -446,28 +446,25 @@ body{
 }
 .anger-marks{display:none;position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;overflow:visible}
 .bubble[data-emotion="angry"].show .anger-marks{display:block}
-.anger-mark{position:absolute;animation:anger-pop-fade 2s ease forwards}
-/* 大的 */
-.anger-mark:nth-child(1){opacity:0}
-.msg-row.left .anger-mark:nth-child(1){top:-10px;right:-2px}
-.msg-row.right .anger-mark:nth-child(1){top:-10px;left:-2px}
-.anger-mark:nth-child(1) img{width:20px;height:20px}
-/* 小的 */
-.anger-mark:nth-child(2){opacity:0;animation-delay:.15s}
-.msg-row.left .anger-mark:nth-child(2){top:-4px;right:-14px}
-.msg-row.right .anger-mark:nth-child(2){top:-4px;left:-14px}
-.anger-mark:nth-child(2) img{width:12px;height:12px}
-/* 感叹号 */
-.anger-mark:nth-child(3){opacity:0;animation-delay:.25s}
-.msg-row.left .anger-mark:nth-child(3){bottom:-8px;right:-4px;top:auto}
-.msg-row.right .anger-mark:nth-child(3){bottom:-8px;left:-4px;top:auto}
-.anger-mark:nth-child(3) img{width:14px;height:14px}
+.anger-mark{position:absolute;animation:anger-pop-fade 2s ease forwards;opacity:0}
+/* 愤怒粒子 —— 按设计稿：29x31, rotate(7deg), 气泡右上角外侧 */
+.anger-icon{animation-delay:0s}
+.msg-row.left .anger-icon{top:-12px;right:-5px}
+.msg-row.right .anger-icon{top:-12px;left:-5px}
+.anger-icon img{width:29px;height:31px}
+.msg-row.left .anger-icon img{transform:rotate(7deg) scale(0.95)}
+.msg-row.right .anger-icon img{transform:rotate(-7deg) scaleX(-1) scale(0.95)}
+/* 感叹号 —— 按设计稿：15x24, 位于愤怒粒子下方 */
+.anger-exclaim{animation-delay:.15s}
+.msg-row.left .anger-exclaim{top:20px;right:-5px}
+.msg-row.right .anger-exclaim{top:20px;left:-5px}
+.anger-exclaim img{width:15px;height:24px}
+.msg-row.right .anger-exclaim img{transform:scaleX(-1)}
 @keyframes anger-pop-fade{
   0%{opacity:0;transform:scale(0) rotate(-20deg)}
   15%{opacity:1;transform:scale(1.15) rotate(5deg)}
   25%{opacity:1;transform:scale(1) rotate(0deg)}
-  70%{opacity:1;transform:scale(1) rotate(0deg)}
-  100%{opacity:0;transform:scale(.5) rotate(10deg)}
+  100%{opacity:1;transform:scale(1) rotate(0deg)}
 }
 @keyframes shake{
   0%,100%{transform:translateX(0) scale(1)}
@@ -477,6 +474,83 @@ body{
   60%{transform:translateX(calc(0.8 * var(--shake-distance))) scale(1)}
   75%{transform:translateX(calc(-0.3 * var(--shake-distance))) scale(1)}
   90%{transform:translateX(calc(0.3 * var(--shake-distance))) scale(1)}
+}
+
+/* ============ EMOTION: CONFUSED ============ */
+[data-style="comic"] .bubble[data-emotion="confused"]{
+  box-shadow:none;
+}
+[data-style="comic"] .has-avatar .bubble[data-emotion="confused"].show{
+  animation:bubble-pop-left var(--bubble-duration) var(--bubble-easing) both;
+}
+.msg-row.right .has-avatar .bubble[data-emotion="confused"].show{
+  animation:bubble-pop-right var(--bubble-duration) var(--bubble-easing) both;
+}
+.confused-marks{display:none;position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;overflow:visible}
+.bubble[data-emotion="confused"].show .confused-marks{display:block}
+.confused-mark{position:absolute;opacity:0;animation:confused-pop 0.6s ease forwards, confused-sway 1.5s ease-in-out 0.6s infinite}
+/* 3个问号 —— 右上角 */
+.confused-mark.confused-questions{animation-delay:0s}
+.msg-row.left .confused-mark.confused-questions{top:-10px;right:-2px}
+.msg-row.right .confused-mark.confused-questions{top:-10px;left:-2px}
+.confused-mark.confused-questions img{width:21px;height:22px}
+.msg-row.right .confused-mark.confused-questions img{transform:scaleX(-1)}
+/* 红色问号 —— 左下角 */
+.confused-mark.confused-red{animation-delay:.2s}
+.msg-row.left .confused-mark.confused-red{bottom:-4px;left:-1px;top:auto}
+.msg-row.right .confused-mark.confused-red{bottom:-4px;right:-1px;top:auto}
+.confused-mark.confused-red img{width:10px;height:16px}
+.msg-row.left .confused-mark.confused-red img{transform:rotate(-15deg)}
+.msg-row.right .confused-mark.confused-red img{transform:rotate(15deg) scaleX(-1)}
+@keyframes confused-pop{
+  0%{opacity:0;transform:scale(0) translateY(4px)}
+  30%{opacity:1;transform:scale(1.1) translateY(-2px)}
+  50%{opacity:1;transform:scale(1) translateY(0)}
+  100%{opacity:1;transform:scale(1) translateY(0)}
+}
+@keyframes confused-sway{
+  0%,100%{transform:rotate(0deg)}
+  25%{transform:rotate(-5deg)}
+  75%{transform:rotate(5deg)}
+}
+
+/* ============ EMOTION: LOVE ============ */
+[data-style="comic"] .bubble[data-emotion="love"]{
+  box-shadow:none;
+}
+[data-style="comic"] .has-avatar .bubble[data-emotion="love"].show{
+  animation:bubble-pop-left var(--bubble-duration) var(--bubble-easing) both;
+}
+.msg-row.right .has-avatar .bubble[data-emotion="love"].show{
+  animation:bubble-pop-right var(--bubble-duration) var(--bubble-easing) both;
+}
+.love-marks{display:none;position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;overflow:visible}
+.bubble[data-emotion="love"].show .love-marks{display:block}
+.love-mark{position:absolute;opacity:0;animation:love-float 0.8s ease forwards}
+/* 左1爱心 —— 左上角外侧 */
+.love-mark.love-1{animation-delay:0s}
+.msg-row.left .love-mark.love-1{top:-3px;right:-7px}
+.msg-row.right .love-mark.love-1{top:-3px;left:-7px}
+.love-mark.love-1 img{width:16px;height:16px}
+.msg-row.left .love-mark.love-1 img{transform:scaleX(-1)}
+/* 左2爱心 —— 左侧中间 */
+.love-mark.love-2{animation-delay:.15s}
+.msg-row.left .love-mark.love-2{top:9px;right:-10px}
+.msg-row.right .love-mark.love-2{top:9px;left:-10px}
+.love-mark.love-2 img{width:12px;height:12px}
+.msg-row.left .love-mark.love-2 img{transform:scaleX(-1)}
+/* 右1爱心 —— 右下角 */
+.love-mark.love-3{animation-delay:.3s}
+.msg-row.left .love-mark.love-3{bottom:-6px;left:-3px;top:auto}
+.msg-row.right .love-mark.love-3{bottom:-6px;right:-3px;top:auto}
+.love-mark.love-3 img{width:13px;height:13px}
+.msg-row.left .love-mark.love-3 img{transform:scaleX(-1) scale(0.6)}
+.msg-row.right .love-mark.love-3 img{transform:scale(0.6)}
+@keyframes love-float{
+  0%{opacity:0;transform:scale(0) translateY(16px)}
+  30%{opacity:1;transform:scale(1.3) translateY(-8px)}
+  60%{opacity:1;transform:scale(0.95) translateY(-3px)}
+  100%{opacity:1;transform:scale(1) translateY(0)}
 }
 
 /* ============ TYPING CURSOR (隐藏) ============ */
@@ -1048,6 +1122,19 @@ window.addEventListener('unhandledrejection', function(e) {
           '这谁顶得住啊',
           '算了 懒得理了',
         ],
+        confused: [
+          '啥情况',
+          '没看懂 再说一遍',
+          '？',
+          '什么意思',
+          '等等 我没跟上',
+        ],
+        love: [
+          '咳 别肉麻了',
+          '行吧 收下了',
+          '低调低调',
+          '嗯...',
+        ],
         neutral: [
           '行 没问题',
           '可以 随时',
@@ -1079,6 +1166,18 @@ window.addEventListener('unhandledrejection', function(e) {
           '别气了别气了',
           '消消气吧',
           '深呼吸深呼吸',
+        ],
+        confused: [
+          '啊？',
+          '没懂',
+          '什么什么',
+          '？？？',
+        ],
+        love: [
+          '好甜～',
+          '撒狗粮了',
+          '嘿嘿',
+          '羡慕了',
         ],
         neutral: [
           '加我一个加我一个',
@@ -1112,6 +1211,18 @@ window.addEventListener('unhandledrejection', function(e) {
           '也太过分了！',
           '哼 生气了',
           '我不管 不开心',
+        ],
+        confused: [
+          '啊？什么意思',
+          '没听懂诶',
+          '？？？',
+          '等等说慢点',
+        ],
+        love: [
+          '好甜好甜！',
+          '啊啊啊磕到了',
+          '我也爱你们！',
+          '甜死了～',
         ],
         neutral: [
           '收到～',
@@ -1147,6 +1258,19 @@ window.addEventListener('unhandledrejection', function(e) {
           '谁啊这是 气死姐了！',
           '哼 本姑娘的怒火到达顶点了',
         ],
+        confused: [
+          '啊？什么情况(・・？)',
+          '没懂没懂 再说一遍～',
+          '等下 我脑子转不过来了',
+          '？？？这啥意思',
+          '迷惑中...(´-ω-`)',
+        ],
+        love: [
+          '啊啊啊好甜！磕到了～',
+          '呜呜呜 恋爱的酸臭味',
+          '我也要恋爱！(╥_╥)',
+          '太甜了叭～羡慕嫉妒',
+        ],
         neutral: [
           '+1+1',
           '了解了～',
@@ -1179,6 +1303,18 @@ window.addEventListener('unhandledrejection', function(e) {
           '不理你们了哼(╥_╥)',
           '过分！本小姐生气了！',
         ],
+        confused: [
+          '诶？什么意思呀(・・?)',
+          '没听懂啦～再说一遍嘛',
+          '？？？好迷惑',
+          '等等我脑子跟不上了(๑°o°๑)',
+        ],
+        love: [
+          '天哪好甜！！♡♡♡',
+          '我也爱你呀～(◕ᴗ◕✿)',
+          '啊啊啊磕死我了！',
+          '甜蜜蜜～mua！',
+        ],
         neutral: [
           '嗯嗯好哒~(◕ᴗ◕✿)',
           '收到收到♪',
@@ -1193,10 +1329,14 @@ window.addEventListener('unhandledrejection', function(e) {
 
   /* ============ 情绪检测 ============ */
   function detectEmotion(text) {
-    const excitedWords = ['哈哈','太好了','冲冲冲','开心','好棒','太棒','耶','！！','!!','awsl','绝了','好耶','万岁','啦啦啦','666','nice','好开心','激动','兴奋','爱了','哇','想去','一起','出发','走起','期待'];
+    const excitedWords = ['哈哈','太好了','冲冲冲','开心','好棒','太棒','耶','！！','!!','awsl','绝了','好耶','万岁','啦啦啦','666','nice','好开心','激动','兴奋','哇','想去','一起','出发','走起','期待'];
     const angryWords = ['生气','愤怒','气死','烦死','讨厌','可恶','混蛋','去你的','滚','怒','火大','不爽','靠','我擦','无语','离谱','过分','烦','恶心','讨厌'];
+    const loveWords = ['爱你','喜欢你','么么','mua','亲亲','爱了','心动','好爱','太爱','暗恋','表白','恋爱','甜蜜','♡','❤','想你','抱抱','宝贝'];
+    const confusedWords = ['什么','为啥','不懂','？？','??','看不懂','怎么回事','啥意思','为什么','咋回事','搞不懂','迷惑','疑惑','谁','哪里','怎么','咋','啥','蒙了','懵'];
     const lowerText = text.toLowerCase();
     for (const w of angryWords) { if (lowerText.includes(w)) return 'angry'; }
+    for (const w of loveWords) { if (lowerText.includes(w)) return 'love'; }
+    for (const w of confusedWords) { if (lowerText.includes(w)) return 'confused'; }
     for (const w of excitedWords) { if (lowerText.includes(w)) return 'excited'; }
     return 'neutral';
   }
@@ -1355,10 +1495,16 @@ window.addEventListener('unhandledrejection', function(e) {
 
     let sparklesHTML = '';
     let angerHTML = '';
+    let confusedHTML = '';
+    let loveHTML = '';
     if (emotion === 'excited') {
       sparklesHTML = '<div class="sparkles"><span class="sparkle"></span><span class="sparkle"></span><span class="sparkle"></span></div>';
     } else if (emotion === 'angry') {
-      angerHTML = '<div class="anger-marks"><span class="anger-mark"><img src="愤怒.png" alt=""></span><span class="anger-mark"><img src="愤怒.png" alt=""></span><span class="anger-mark"><img src="生气感叹号.png" alt=""></span></div>';
+      angerHTML = '<div class="anger-marks"><span class="anger-mark anger-icon"><img src="愤怒.png" alt=""></span><span class="anger-mark anger-exclaim"><img src="生气感叹号.png" alt=""></span></div>';
+    } else if (emotion === 'confused') {
+      confusedHTML = '<div class="confused-marks"><span class="confused-mark confused-questions"><img src="3个问号.png" alt=""></span><span class="confused-mark confused-red"><img src="红色问号.png" alt=""></span></div>';
+    } else if (emotion === 'love') {
+      loveHTML = '<div class="love-marks"><span class="love-mark love-1"><img src="左1爱心.png" alt=""></span><span class="love-mark love-2"><img src="左2爱心.png" alt=""></span><span class="love-mark love-3"><img src="右1爱心.png" alt=""></span></div>';
     }
 
     const nameAlign = side === 'right' ? 'text-align:right' : '';
@@ -1380,7 +1526,7 @@ window.addEventListener('unhandledrejection', function(e) {
           <span class="sender-name" style="${nameAlign}">${member.name}</span>
           <div class="bubble" data-emotion="${emotion}" id="${bubbleId}">
             <span class="bubble-text"></span>
-            ${sparklesHTML}${angerHTML}
+            ${sparklesHTML}${angerHTML}${confusedHTML}${loveHTML}
           </div>
         </div>
       `;
