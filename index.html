@@ -641,22 +641,22 @@ body{
   width:5px;height:5px;
   animation:sleepy-pop 0.6s cubic-bezier(.34,1.56,.64,1) 0s forwards, sleepy-sway 2s ease-in-out 0.6s infinite;
 }
-.msg-row.left .sleepy-mark.z-1{top:4px;right:-2px}
-.msg-row.right .sleepy-mark.z-1{top:4px;left:-2px}
+.msg-row.left .sleepy-mark.z-1{top:4px;right:3px}
+.msg-row.right .sleepy-mark.z-1{top:4px;left:3px}
 /* 中Z */
 .sleepy-mark.z-2{
   width:7px;height:7px;
   animation:sleepy-pop 0.6s cubic-bezier(.34,1.56,.64,1) 0.3s forwards, sleepy-sway 2s ease-in-out 0.9s infinite;
 }
-.msg-row.left .sleepy-mark.z-2{top:-2px;right:-6px}
-.msg-row.right .sleepy-mark.z-2{top:-2px;left:-6px}
+.msg-row.left .sleepy-mark.z-2{top:-2px;right:-1px}
+.msg-row.right .sleepy-mark.z-2{top:-2px;left:-1px}
 /* 大Z：最远 */
 .sleepy-mark.z-3{
   width:10px;height:9px;
   animation:sleepy-pop 0.6s cubic-bezier(.34,1.56,.64,1) 0.6s forwards, sleepy-sway 2s ease-in-out 1.2s infinite;
 }
-.msg-row.left .sleepy-mark.z-3{top:-10px;right:-11px}
-.msg-row.right .sleepy-mark.z-3{top:-10px;left:-11px}
+.msg-row.left .sleepy-mark.z-3{top:-10px;right:-6px}
+.msg-row.right .sleepy-mark.z-3{top:-10px;left:-6px}
 .msg-row.right .sleepy-mark{transform-origin:center}
 @keyframes sleepy-pop{
   0%{opacity:0;transform:scale(0.3) translateY(6px) rotate(-20deg)}
@@ -811,6 +811,20 @@ body{
 @keyframes item-sway{
   0%,100%{transform:rotate(0deg) translateY(0)}
   50%{transform:rotate(-6deg) translateY(-2px)}
+}
+
+/* 话题共鸣连线（心电图/闪电波风格） */
+.resonance-link-layer{overflow:visible;pointer-events:none}
+.resonance-link{
+  /* 尖峰路径用扫描入场 */
+}
+.resonance-dot{
+  animation:resonance-dot-pulse 1s ease-in-out infinite;
+  transform-origin:center;transform-box:fill-box;
+}
+@keyframes resonance-dot-pulse{
+  0%,100%{r:3;opacity:0.7}
+  50%{r:5;opacity:1}
 }
 
 /* 气泡共鸣 —— 全屏鬼畜气泡特效 */
@@ -1707,7 +1721,7 @@ window.addEventListener('unhandledrejection', function(e) {
 
   /* ============ 情绪检测 ============ */
   function detectEmotion(text) {
-    const excitedWords = ['哈哈','太好了','冲冲冲','开心','好棒','太棒','耶','！！','!!','awsl','绝了','好耶','万岁','啦啦啦','666','nice','好开心','激动','兴奋','哇','想去','一起','出发','走起','期待'];
+    const excitedWords = ['哈哈','太好了','冲冲冲','好开心','开心死','好棒','太棒','耶！','！！','!!','awsl','绝了','好耶','万岁','啦啦啦','666','好激动','好兴奋','爱死了','太赞','爽翻'];
     const angryWords = ['生气','愤怒','气死','烦死','讨厌','可恶','混蛋','去你的','滚','怒','火大','不爽','靠','我擦','无语','离谱','过分','烦','恶心','讨厌'];
     const loveWords = ['爱你','喜欢你','么么','mua','亲亲','爱了','心动','好爱','太爱','暗恋','表白','恋爱','甜蜜','♡','❤','想你','抱抱','宝贝'];
     const sleepyWords = ['困了','困死','好困','睡觉','睡了','zzz','ZZZ','zZ','累死','好累','熬夜','打哈欠','哈欠','想睡','晚安','洗洗睡','床上见','早点睡'];
@@ -1883,7 +1897,6 @@ window.addEventListener('unhandledrejection', function(e) {
       { keys: ['电影','看片','影院'], emoji: '🎬' },
       { keys: ['游戏','玩游戏','打游戏'], emoji: '🎮' },
       { keys: ['书','阅读','看书'], emoji: '📚' },
-      { keys: ['睡觉','困','zzz'], emoji: '😴' },
       { keys: ['下雨','雨'], emoji: '☔' },
       { keys: ['太阳','晴天'], emoji: '☀️' },
       { keys: ['钱','工资','发财'], emoji: '💰' },
@@ -2216,6 +2229,177 @@ window.addEventListener('unhandledrejection', function(e) {
         if (el) el.textContent = this.activeFaction.countB;
       }
     },
+
+    /* ============ 话题共鸣连线 ============ */
+    TOPIC_PATTERNS: [
+      { key: 'food', reg: /吃|饭|火锅|烧烤|奶茶|麻辣|美食|饿|午饭|晚饭|外卖|炸鸡|蛋糕|披萨|汉堡/ },
+      { key: 'game', reg: /玩|游戏|王者|吃鸡|原神|联机|开黑|上分|段位|排位|主机|steam/ },
+      { key: 'travel', reg: /出去|出发|旅游|去哪|周末|假期|放假|镰仓|海边|爬山|露营|音乐节|机票|酒店/ },
+      { key: 'study', reg: /考试|作业|上课|老师|学校|期末|及格|挂科|论文|复习|成绩|学习/ },
+      { key: 'look', reg: /好看|帅|美|漂亮|可爱|穿搭|衣服|拍照|自拍|滤镜/ },
+      { key: 'bored', reg: /无聊|没意思|干嘛|干啥|做什么|好闷/ },
+      { key: 'sleep', reg: /困了|困死|好困|睡觉|睡了|累|晚安|哈欠/ },
+      { key: 'work', reg: /上班|加班|项目|工作|工资|kpi|老板|同事|会议|出差/ },
+      { key: 'love', reg: /喜欢|爱|恋爱|暗恋|表白|约会|男友|女友|对象|分手/ },
+      { key: 'pet', reg: /猫|狗|喵|汪|宠物|主子|铲屎/ },
+    ],
+    detectTopic(text) {
+      for (const t of this.TOPIC_PATTERNS) {
+        if (t.reg.test(text)) return t.key;
+      }
+      return null;
+    },
+    tryDrawResonanceLine(newRow, member, text) {
+      if (!member || !member.hasAvatar) return;
+      const topic = this.detectTopic(text);
+      if (!topic) return;
+      /* 记录当前row的话题 */
+      newRow._topic = topic;
+      /* 找最近5条有形象且相同话题的消息 */
+      const msgListEl = document.getElementById('msgList');
+      if (!msgListEl) return;
+      const rows = Array.from(msgListEl.querySelectorAll('.msg-row'));
+      const idx = rows.indexOf(newRow);
+      for (let i = idx - 1; i >= Math.max(0, idx - 6); i--) {
+        const prev = rows[i];
+        if (!prev || !prev.querySelector('.avatar-character')) continue;
+        if (prev._topic === topic) {
+          this.drawResonanceLine(prev, newRow);
+          break;
+        }
+      }
+    },
+    drawResonanceLine(rowA, rowB) {
+      const msgListEl = document.getElementById('msgList');
+      if (!msgListEl) return;
+      const avA = rowA.querySelector('.avatar-character');
+      const avB = rowB.querySelector('.avatar-character');
+      if (!avA || !avB) return;
+      const listRect = msgListEl.getBoundingClientRect();
+      const rectA = avA.getBoundingClientRect();
+      const rectB = avB.getBoundingClientRect();
+      const ax = rectA.left - listRect.left + rectA.width / 2;
+      const ay = rectA.top - listRect.top + rectA.height / 2 + msgListEl.scrollTop;
+      const bx = rectB.left - listRect.left + rectB.width / 2;
+      const by = rectB.top - listRect.top + rectB.height / 2 + msgListEl.scrollTop;
+      /* 创建 SVG 层 */
+      let svg = msgListEl.querySelector('.resonance-link-layer');
+      if (!svg) {
+        svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('class', 'resonance-link-layer');
+        svg.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:' + msgListEl.scrollHeight + 'px;pointer-events:none;z-index:1;';
+        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        defs.innerHTML = `
+          <linearGradient id="resonance-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#60A5FA" stop-opacity="0"/>
+            <stop offset="15%" stop-color="#3B82F6" stop-opacity="0.9"/>
+            <stop offset="85%" stop-color="#3B82F6" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#60A5FA" stop-opacity="0"/>
+          </linearGradient>
+          <filter id="resonance-glow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        `;
+        svg.appendChild(defs);
+        msgListEl.style.position = 'relative';
+        msgListEl.appendChild(svg);
+      }
+      svg.style.height = msgListEl.scrollHeight + 'px';
+
+      const dx = bx - ax;
+      const dy = by - ay;
+      const len = Math.sqrt(dx*dx + dy*dy);
+      const angle = Math.atan2(dy, dx);
+      const segCount = Math.max(20, Math.floor(len / 8));
+      const nx = -Math.sin(angle);
+      const ny = Math.cos(angle);
+
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('class', 'resonance-link');
+      path.setAttribute('stroke', 'url(#resonance-grad)');
+      path.setAttribute('stroke-width', '0.8');
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke-linecap', 'round');
+      path.setAttribute('stroke-linejoin', 'round');
+      path.setAttribute('filter', 'url(#resonance-glow)');
+      svg.appendChild(path);
+
+      /* 生成动态波形路径的函数：t0 是时间偏移量 */
+      function buildPath(phase) {
+        const pts = [];
+        for (let i = 0; i <= segCount; i++) {
+          const t = i / segCount;
+          const baseX = ax + dx * t;
+          const baseY = ay + dy * t;
+          /* 心电图 + 流动脉冲：主脉冲位置随时间移动 */
+          let amp = 0;
+          /* 找出当前脉冲中心位置（沿线来回移动） */
+          const pulseCenter = 0.3 + 0.4 * (0.5 + 0.5 * Math.sin(phase * 2));
+          const distFromPulse = Math.abs(t - pulseCenter);
+          if (distFromPulse < 0.12) {
+            /* 心电波形 */
+            const local = (t - (pulseCenter - 0.12)) / 0.24;
+            if (local < 0.2) amp = 3;
+            else if (local < 0.32) amp = -8;
+            else if (local < 0.44) amp = 22;
+            else if (local < 0.56) amp = -14;
+            else if (local < 0.72) amp = 4;
+            else if (local < 0.85) amp = 6;
+            else amp = 0;
+          } else {
+            /* 其他区域：细微噪波 + 低频波浪 */
+            const jitter = Math.sin(t * 30 + phase * 5) * 1.2;
+            const wave = Math.sin(t * 8 + phase * 3) * 2;
+            amp = jitter + wave;
+          }
+          pts.push([baseX + nx * amp, baseY + ny * amp]);
+        }
+        let d = `M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+        for (let i = 1; i < pts.length; i++) {
+          d += ` L ${pts[i][0].toFixed(1)} ${pts[i][1].toFixed(1)}`;
+        }
+        return d;
+      }
+
+      /* 初始扫描入场 */
+      let startTime = performance.now();
+      let phase = 0;
+      let running = true;
+      function animate(now) {
+        if (!running || !path.parentNode) return;
+        phase = (now - startTime) / 1000;
+        path.setAttribute('d', buildPath(phase));
+        requestAnimationFrame(animate);
+      }
+      /* 入场 dash 扫描 */
+      requestAnimationFrame(animate);
+      /* 首次设置 dasharray 扫出入场 */
+      setTimeout(() => {
+        try {
+          const L = path.getTotalLength();
+          path.style.strokeDasharray = L;
+          path.style.strokeDashoffset = L;
+          path.style.transition = 'stroke-dashoffset 0.8s ease-out';
+          requestAnimationFrame(() => { path.style.strokeDashoffset = '0'; });
+          setTimeout(() => {
+            /* 入场完成后清除dash，让线保持完整 */
+            path.style.strokeDasharray = '';
+            path.style.strokeDashoffset = '';
+            path.style.transition = '';
+          }, 900);
+        } catch(e) {}
+      }, 0);
+
+      /* 4秒后淡出 */
+      setTimeout(() => {
+        if (path.parentNode) {
+          path.style.transition = 'opacity .6s';
+          path.style.opacity = '0';
+        }
+        setTimeout(() => {
+          running = false;
+          if (path.parentNode) path.remove();
+        }, 600);
+      }, 4000);
+    },
   };
 
   /* 当前Demo模式 */
@@ -2324,6 +2508,10 @@ window.addEventListener('unhandledrejection', function(e) {
           const b = row.querySelector('.bubble');
           if (b) GameMode.dropItem(itemEmoji, b);
         }, 600);
+      }
+      /* 话题共鸣连线：有形象用户聊相同话题时连接 */
+      if (member && member.hasAvatar) {
+        setTimeout(() => GameMode.tryDrawResonanceLine(row, member, text), 800);
       }
     }
 
@@ -2518,7 +2706,7 @@ window.addEventListener('unhandledrejection', function(e) {
           `${opt}yyds`, `投${opt}一票`, `我站${opt}`, `${opt}无脑冲`,
         ];
         text = templates[Math.floor(Math.random() * templates.length)];
-        replies.push({ member, text, emotion: 'excited', factionSide: side });
+        replies.push({ member, text, emotion: 'neutral', factionSide: side });
         continue;
       }
 
@@ -2942,7 +3130,7 @@ window.addEventListener('unhandledrejection', function(e) {
       btn.classList.add('active');
       /* 切回基础模式时清理游戏化元素 */
       if (btn.dataset.demo === 'basic') {
-        document.querySelectorAll('.resonance-fx, .faction-scoreboard, .falling-item').forEach(el => el.remove());
+        document.querySelectorAll('.resonance-fx, .faction-scoreboard, .falling-item, .resonance-link-layer').forEach(el => el.remove());
         document.querySelectorAll('.msg-row').forEach(r => {
           r.classList.remove('angry-push','angry-squeezed','angry-king','angry-loser','faction-a','faction-b');
         });
