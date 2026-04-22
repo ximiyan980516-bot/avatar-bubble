@@ -314,6 +314,33 @@ body{
   border-image:none;padding:9px 14px;display:block;
 }
 
+/* ============ 气泡 A（普通气泡：纯矩形圆角） ============ */
+[data-bubble="A"] .msg-row.left .has-avatar .bubble,
+[data-bubble="A"] .msg-row.left .no-avatar .bubble{
+  background:var(--gray-200);
+  border:none;border-radius:12px;
+  border-image:none;border-width:0;
+  padding:9px 14px;
+  color:var(--text-primary);
+  display:block;min-height:42px;
+  box-shadow:none;
+  margin-left:8px;
+}
+[data-bubble="A"] .msg-row.right .has-avatar .bubble,
+[data-bubble="A"] .msg-row.right .no-avatar .bubble{
+  background:#0099ff;
+  border:none;border-radius:12px;
+  border-image:none;border-width:0;
+  padding:9px 14px;
+  color:#fff;
+  display:block;min-height:42px;
+  box-shadow:none;
+  margin-right:8px;
+}
+/* 昵称对齐 */
+[data-bubble="A"] .msg-row.left .sender-name{text-align:left}
+[data-bubble="A"] .msg-row.right .sender-name{text-align:right}
+
 /* ============ 气泡 B（漫画方形） ============ */
 [data-bubble="B"] .msg-row.left .has-avatar .bubble{
   margin-left:-10px;
@@ -514,6 +541,11 @@ body{
 .msg-row.right .anger-exclaim{top:20px;left:-5px}
 .anger-exclaim img{width:15px;height:24px}
 .msg-row.right .anger-exclaim img{transform:scaleX(-1)}
+/* 普通气泡(A)愤怒粒子位置补偿：左侧向右5px、右侧向左5px */
+[data-bubble="A"] .msg-row.left .anger-icon{right:-10px}
+[data-bubble="A"] .msg-row.right .anger-icon{left:-10px}
+[data-bubble="A"] .msg-row.left .anger-exclaim{right:-10px}
+[data-bubble="A"] .msg-row.right .anger-exclaim{left:-10px}
 @keyframes anger-pop-fade{
   0%{opacity:0;transform:scale(0) rotate(-20deg)}
   15%{opacity:1;transform:scale(1.15) rotate(5deg)}
@@ -612,6 +644,14 @@ body{
 [data-bubble="D"] .msg-row.right .love-mark.love-2{left:-6px}
 [data-bubble="D"] .msg-row.left .love-mark.love-3{left:6px}
 [data-bubble="D"] .msg-row.right .love-mark.love-3{right:6px}
+/* 普通气泡(A)粒子位置补偿：A的margin比C多14px，粒子整体保持贴合 */
+/* 爱心整体往形象方向偏移15px，让粒子更贴近头像 */
+[data-bubble="A"] .msg-row.left .love-mark.love-1{right:-6px}
+[data-bubble="A"] .msg-row.right .love-mark.love-1{left:-6px}
+[data-bubble="A"] .msg-row.left .love-mark.love-2{right:-9px}
+[data-bubble="A"] .msg-row.right .love-mark.love-2{left:-9px}
+[data-bubble="A"] .msg-row.left .love-mark.love-3{left:-4px}
+[data-bubble="A"] .msg-row.right .love-mark.love-3{right:-4px}
 @keyframes love-float{
   0%{opacity:0;transform:scale(0) translateY(16px)}
   30%{opacity:1;transform:scale(1.3) translateY(-8px)}
@@ -666,6 +706,77 @@ body{
 @keyframes sleepy-sway{
   0%,100%{transform:scale(1) translateY(0) rotate(0deg)}
   50%{transform:scale(1.03) translateY(-2px) rotate(-5deg)}
+}
+
+/* ============ EMOTION: SAD ============ */
+[data-style="comic"] .bubble[data-emotion="sad"]{
+  box-shadow:none;
+}
+[data-style="comic"] .has-avatar .bubble[data-emotion="sad"].show{
+  animation:bubble-pop-left var(--bubble-duration) var(--bubble-easing) both, sad-droop 2.4s ease-in-out var(--bubble-duration) infinite;
+}
+.msg-row.right .has-avatar .bubble[data-emotion="sad"].show{
+  animation:bubble-pop-right var(--bubble-duration) var(--bubble-easing) both, sad-droop 2.4s ease-in-out var(--bubble-duration) infinite;
+}
+.sad-marks{display:none;position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;overflow:visible}
+.bubble[data-emotion="sad"].show .sad-marks{display:block}
+.sad-mark{position:absolute;opacity:0}
+/* 双泪滴（主） —— 气泡右上角外侧，按 Figma: left:106, top:-8（气泡宽 109，突出约 -3px）*/
+.sad-mark.sad-1{animation:sad-pop 0.6s ease-out 0s forwards, sad-fly 2.2s ease-out 0.6s infinite}
+.msg-row.left .sad-mark.sad-1{top:-8px;right:-3px}
+.msg-row.right .sad-mark.sad-1{top:-8px;left:-3px}
+.sad-mark.sad-1 img{width:14px;height:18px;display:block}
+.msg-row.right .sad-mark.sad-1 img{transform:scaleX(-1)}
+/* 小泪滴（辅） —— 紧邻主泪滴右上方，几乎贴在一起 */
+.sad-mark.sad-2{animation:sad-pop 0.6s ease-out 0.2s forwards, sad-fly-small 2.4s ease-out 0.8s infinite}
+.msg-row.left .sad-mark.sad-2{top:-12px;right:-10px}
+.msg-row.right .sad-mark.sad-2{top:-12px;left:-10px}
+.sad-mark.sad-2 img{width:11px;height:11px;display:block}
+.msg-row.right .sad-mark.sad-2 img{transform:scaleX(-1)}
+/* 泡泡气泡(D) 难过粒子位置补偿 */
+[data-bubble="D"] .msg-row.left .sad-mark.sad-1{right:1px}
+[data-bubble="D"] .msg-row.right .sad-mark.sad-1{left:1px}
+[data-bubble="D"] .msg-row.left .sad-mark.sad-2{right:-6px}
+[data-bubble="D"] .msg-row.right .sad-mark.sad-2{left:-6px}
+/* 普通气泡(A) 难过粒子位置补偿（整体往形象方向偏移，贴合气泡）*/
+[data-bubble="A"] .msg-row.left .sad-mark.sad-1{right:-11px}
+[data-bubble="A"] .msg-row.right .sad-mark.sad-1{left:-11px}
+[data-bubble="A"] .msg-row.left .sad-mark.sad-2{right:-18px}
+[data-bubble="A"] .msg-row.right .sad-mark.sad-2{left:-18px}
+@keyframes sad-pop{
+  0%{opacity:0;transform:scale(0.3) translate(0,-6px)}
+  60%{opacity:1;transform:scale(1.15) translate(0,2px)}
+  100%{opacity:1;transform:scale(1) translate(0,0)}
+}
+/* 泪滴向外飞散（右上方，幅度收敛）—— 主泪滴 */
+@keyframes sad-fly{
+  0%{opacity:1;transform:translate(0,0) scale(1) rotate(0deg)}
+  60%{opacity:1;transform:translate(4px,-6px) scale(0.95) rotate(10deg)}
+  100%{opacity:0;transform:translate(7px,-10px) scale(0.7) rotate(18deg)}
+}
+/* 小泪滴飞散（幅度略大一点点） */
+@keyframes sad-fly-small{
+  0%{opacity:1;transform:translate(0,0) scale(1) rotate(0deg)}
+  60%{opacity:1;transform:translate(5px,-7px) scale(0.9) rotate(14deg)}
+  100%{opacity:0;transform:translate(9px,-12px) scale(0.6) rotate(22deg)}
+}
+/* 右侧消息镜像飞行方向（飞向左上）*/
+.msg-row.right .sad-mark.sad-1{animation:sad-pop 0.6s ease-out 0s forwards, sad-fly-right 2.2s ease-out 0.6s infinite}
+.msg-row.right .sad-mark.sad-2{animation:sad-pop 0.6s ease-out 0.2s forwards, sad-fly-small-right 2.4s ease-out 0.8s infinite}
+@keyframes sad-fly-right{
+  0%{opacity:1;transform:translate(0,0) scale(1) rotate(0deg)}
+  60%{opacity:1;transform:translate(-4px,-6px) scale(0.95) rotate(-10deg)}
+  100%{opacity:0;transform:translate(-7px,-10px) scale(0.7) rotate(-18deg)}
+}
+@keyframes sad-fly-small-right{
+  0%{opacity:1;transform:translate(0,0) scale(1) rotate(0deg)}
+  60%{opacity:1;transform:translate(-5px,-7px) scale(0.9) rotate(-14deg)}
+  100%{opacity:0;transform:translate(-9px,-12px) scale(0.6) rotate(-22deg)}
+}
+/* 气泡轻微下垂（像哭泣时的叹息）*/
+@keyframes sad-droop{
+  0%,100%{filter:none}
+  50%{filter:brightness(0.97)}
 }
 
 /* ============ TYPING CURSOR (隐藏) ============ */
@@ -980,6 +1091,7 @@ body{
 [data-demo="game"] .msg-row.faction-a{
   align-self:flex-start;
   display:inline-flex;
+  flex-shrink:0;
   transform-origin:left center;
   transform:scale(0.8);
   background:linear-gradient(90deg,rgba(107,91,255,.12) 0%,transparent 60%);
@@ -991,6 +1103,7 @@ body{
 [data-demo="game"] .msg-row.faction-b{
   align-self:flex-end;
   display:inline-flex;
+  flex-shrink:0;
   transform-origin:right center;
   transform:scale(0.8);
   background:linear-gradient(90deg,transparent 40%,rgba(236,72,153,.12) 100%);
@@ -998,6 +1111,15 @@ body{
   padding-right:4px;
   border-radius:12px 0 0 12px;
   animation:faction-msg-in-right .45s cubic-bezier(.34,1.56,.64,1) both;
+}
+/* 阵营消息内的气泡文字不折行 */
+[data-demo="game"] .msg-row.faction-a .bubble-text,
+[data-demo="game"] .msg-row.faction-b .bubble-text{
+  white-space:nowrap;
+}
+[data-demo="game"] .msg-row.faction-a .bubble-wrap,
+[data-demo="game"] .msg-row.faction-b .bubble-wrap{
+  max-width:none;
 }
 @keyframes faction-msg-in-left{
   0%{transform:translateX(-30px) scale(.6);opacity:0}
@@ -1114,21 +1236,21 @@ body{
   border-image-source:url('bubbleB-right.png');
   border-image-slice:75 120 36 84 fill;
   border-image-width:25px 40px 12px 28px;
-  padding:6px 26px 6px 8px;
+  padding:6px 31px 6px 8px;
 }
 /* 气泡C样式 - 尖角朝右 */
 [data-bubble="C"] .os-bubble{
   border-image-source:url('bubbleC-right.png');
   border-image-slice:63 84 66 66 fill;
   border-image-width:21px 28px 22px 22px;
-  padding:6px 20px 6px 6px;
+  padding:6px 25px 6px 6px;
 }
 /* 气泡D样式 - 尖角朝右 */
 [data-bubble="D"] .os-bubble{
   border-image-source:url('bubbleD-right.png');
   border-image-slice:78 116 66 66 fill;
   border-image-width:26px 38px 22px 22px;
-  padding:6px 22px 6px 8px;
+  padding:6px 27px 6px 8px;
 }
 
 /* 底部工具栏 */
@@ -1196,6 +1318,7 @@ body{
         <button data-demo="game" class="active">游戏化demo</button>
       </div>
       <div class="style-toggle" id="bubbleStyleToggle">
+        <button data-bubble="A">普通气泡</button>
         <button data-bubble="B">漫画气泡</button>
         <button data-bubble="C" class="active">简约气泡</button>
         <button data-bubble="D">泡泡气泡</button>
@@ -1503,6 +1626,13 @@ window.addEventListener('unhandledrejection', function(e) {
           '嗯 睡了',
           '早点休息',
         ],
+        sad: [
+          '别难过了',
+          '人生哪有那么多事',
+          '哥陪你喝一杯',
+          '这点破事 翻篇吧',
+          '哭一下就完事了',
+        ],
         neutral: [
           '行 没问题',
           '可以 随时',
@@ -1552,6 +1682,13 @@ window.addEventListener('unhandledrejection', function(e) {
           '洗洗睡吧',
           '晚安～',
           'zzz',
+        ],
+        sad: [
+          '呜呜呜抱抱',
+          '怎么啦怎么啦',
+          '别哭别哭',
+          '我也好难过',
+          '555 摸摸头',
         ],
         neutral: [
           '加我一个加我一个',
@@ -1603,6 +1740,13 @@ window.addEventListener('unhandledrejection', function(e) {
           '我也要睡了',
           '晚安晚安～',
           '睡觉觉了',
+        ],
+        sad: [
+          '抱抱你呀～',
+          '呜呜呜一起哭',
+          '别难过啦',
+          '给你递纸巾',
+          '爱你唷 不哭不哭',
         ],
         neutral: [
           '收到～',
@@ -1657,6 +1801,13 @@ window.addEventListener('unhandledrejection', function(e) {
           '晚安姐妹们 明天见',
           '呜呜呜想睡觉了',
         ],
+        sad: [
+          '呜呜呜咋了咋了',
+          '姐妹别哭 抱紧你',
+          'T_T 我也想哭了',
+          '破防了真的',
+          '说出来 姐妹陪你',
+        ],
         neutral: [
           '+1+1',
           '了解了～',
@@ -1707,6 +1858,13 @@ window.addEventListener('unhandledrejection', function(e) {
           '本小姐要睡美容觉啦♡',
           '困困睡觉觉～',
         ],
+        sad: [
+          '呜呜呜不哭了哈～(｡•́︿•̀｡)',
+          '宝贝怎么啦 抱抱你',
+          '本小姐陪你一起哭♡',
+          'T_T 我的心都碎啦',
+          '给你递小饼干 别难过了',
+        ],
         neutral: [
           '嗯嗯好哒~(◕ᴗ◕✿)',
           '收到收到♪',
@@ -1726,8 +1884,10 @@ window.addEventListener('unhandledrejection', function(e) {
     const loveWords = ['爱你','喜欢你','么么','mua','亲亲','爱了','心动','好爱','太爱','暗恋','表白','恋爱','甜蜜','♡','❤','想你','抱抱','宝贝'];
     const sleepyWords = ['困了','困死','好困','睡觉','睡了','zzz','ZZZ','zZ','累死','好累','熬夜','打哈欠','哈欠','想睡','晚安','洗洗睡','床上见','早点睡'];
     const confusedWords = ['什么','为啥','不懂','？？','??','看不懂','怎么回事','啥意思','为什么','咋回事','搞不懂','迷惑','疑惑','谁','哪里','怎么','咋','啥','蒙了','懵'];
+    const sadWords = ['难过','伤心','哭了','哭泣','呜呜','555','T T','TT','T_T','QAQ','qaq','心碎','难受','委屈','想哭','泪目','破防','好惨','emo','丧','郁闷','失落','崩溃','绝望','失望'];
     const lowerText = text.toLowerCase();
     for (const w of angryWords) { if (lowerText.includes(w)) return 'angry'; }
+    for (const w of sadWords) { if (lowerText.includes(w)) return 'sad'; }
     for (const w of sleepyWords) { if (lowerText.includes(w)) return 'sleepy'; }
     for (const w of loveWords) { if (lowerText.includes(w)) return 'love'; }
     for (const w of confusedWords) { if (lowerText.includes(w)) return 'confused'; }
@@ -2421,6 +2581,7 @@ window.addEventListener('unhandledrejection', function(e) {
     let confusedHTML = '';
     let loveHTML = '';
     let sleepyHTML = '';
+    let sadHTML = '';
     if (emotion === 'excited') {
       sparklesHTML = '<div class="sparkles"><span class="sparkle"></span><span class="sparkle-wow"></span></div>';
     } else if (emotion === 'angry') {
@@ -2431,6 +2592,8 @@ window.addEventListener('unhandledrejection', function(e) {
       loveHTML = '<div class="love-marks"><span class="love-mark love-1"><img src="左1爱心.png" alt=""></span><span class="love-mark love-2"><img src="左2爱心.png" alt=""></span><span class="love-mark love-3"><img src="右1爱心.png" alt=""></span></div>';
     } else if (emotion === 'sleepy') {
       sleepyHTML = '<div class="sleepy-marks"><span class="sleepy-mark z-1"></span><span class="sleepy-mark z-2"></span><span class="sleepy-mark z-3"></span></div>';
+    } else if (emotion === 'sad') {
+      sadHTML = '<div class="sad-marks"><span class="sad-mark sad-1"><img src="眼泪2.svg" alt=""></span><span class="sad-mark sad-2"><img src="眼泪1.svg" alt=""></span></div>';
     }
 
     const nameAlign = side === 'right' ? 'text-align:right' : '';
@@ -2455,7 +2618,7 @@ window.addEventListener('unhandledrejection', function(e) {
           <span class="sender-name" style="${nameAlign}">${member.name}</span>
           <div class="bubble" data-emotion="${emotion}" id="${bubbleId}">
             <span class="bubble-text"></span>
-            ${sparklesHTML}${angerHTML}${confusedHTML}${loveHTML}${sleepyHTML}
+            ${sparklesHTML}${angerHTML}${confusedHTML}${loveHTML}${sleepyHTML}${sadHTML}
           </div>
         </div>
       `;
@@ -2979,15 +3142,40 @@ window.addEventListener('unhandledrejection', function(e) {
         osText.textContent += osContent[osIdx];
         osIdx++;
         setTimeout(typeOS, 60);
+      } else {
+        /* OS完整显示后播放语音（内心独白：慢速+低音） */
+        playOsVoice(osContent, member);
       }
     }
     setTimeout(typeOS, 500);
+  }
+
+  /* 播放内心OS语音：去掉外层括号并使用 whisper 效果（慢速低音） */
+  function playOsVoice(osContent, member) {
+    if (!member || !member.voice) return;
+    /* 去除全角/半角括号，保留内部文字 */
+    const innerText = osContent.replace(/[\(（\)）]/g, '').trim();
+    if (!innerText) return;
+    /* 构造一个临时 voice 配置：慢速+降调，像内心独白 */
+    const whisperVoice = {
+      voiceName: member.voice.voiceName,
+      rate: '-15%',
+      pitch: '-3Hz',
+    };
+    speakText(innerText, whisperVoice);
   }
 
   function closeAvatarSheet() {
     avatarSheet.classList.remove('show');
     avatarSheetOverlay.classList.remove('show');
     currentSheetMember = null;
+    /* 停止OS语音 */
+    try {
+      ttsQueue.length = 0;
+      sharedAudio.pause();
+      sharedAudio.currentTime = 0;
+      ttsPlaying = false;
+    } catch(e) {}
   }
 
   avatarSheetClose.addEventListener('click', closeAvatarSheet);
