@@ -758,6 +758,294 @@ body{
   50%{filter:brightness(0.97)}
 }
 
+/* ============ 动画强度分档（L1 极轻 · L2 轻度 · L3 中度 · L4 强烈）============ */
+/* L1 极轻：仅粒子效果（默认即为这种，无需额外样式）*/
+
+/* ---- L2 轻度：气泡自身微动（呼吸/脉冲，针对不同情绪有对应节律）---- */
+[data-intensity="2"] .bubble[data-emotion="excited"].show{
+  animation:bubble-pop-left var(--bubble-duration) var(--bubble-easing) both,
+            l2-beat 0.9s ease-in-out var(--bubble-duration) 3 !important;
+}
+[data-intensity="2"] .msg-row.right .bubble[data-emotion="excited"].show{
+  animation:bubble-pop-right var(--bubble-duration) var(--bubble-easing) both,
+            l2-beat 0.9s ease-in-out var(--bubble-duration) 3 !important;
+}
+[data-intensity="2"] .bubble[data-emotion="love"].show{
+  animation:bubble-pop-left var(--bubble-duration) var(--bubble-easing) both,
+            l2-heartbeat 1.2s ease-in-out var(--bubble-duration) 3 !important;
+}
+[data-intensity="2"] .msg-row.right .bubble[data-emotion="love"].show{
+  animation:bubble-pop-right var(--bubble-duration) var(--bubble-easing) both,
+            l2-heartbeat 1.2s ease-in-out var(--bubble-duration) 3 !important;
+}
+[data-intensity="2"] .bubble[data-emotion="angry"].show,
+[data-intensity="2"] .msg-row.right .bubble[data-emotion="angry"].show{
+  animation:bubble-pop-left var(--bubble-duration) var(--bubble-easing) both,
+            shake var(--shake-duration) ease var(--bubble-duration),
+            l2-tremor 0.12s linear var(--bubble-duration) 8 !important;
+}
+[data-intensity="2"] .bubble[data-emotion="sad"].show{
+  animation:bubble-pop-left var(--bubble-duration) var(--bubble-easing) both,
+            l2-droop 1.6s ease-in-out var(--bubble-duration) 2 !important;
+}
+[data-intensity="2"] .msg-row.right .bubble[data-emotion="sad"].show{
+  animation:bubble-pop-right var(--bubble-duration) var(--bubble-easing) both,
+            l2-droop 1.6s ease-in-out var(--bubble-duration) 2 !important;
+}
+[data-intensity="2"] .bubble[data-emotion="sleepy"].show{
+  animation:bubble-pop-left var(--bubble-duration) var(--bubble-easing) both,
+            l2-sway 2s ease-in-out var(--bubble-duration) 2 !important;
+}
+[data-intensity="2"] .msg-row.right .bubble[data-emotion="sleepy"].show{
+  animation:bubble-pop-right var(--bubble-duration) var(--bubble-easing) both,
+            l2-sway 2s ease-in-out var(--bubble-duration) 2 !important;
+}
+[data-intensity="2"] .bubble[data-emotion="confused"].show{
+  animation:bubble-pop-left var(--bubble-duration) var(--bubble-easing) both,
+            l2-tilt 1.4s ease-in-out var(--bubble-duration) 2 !important;
+}
+[data-intensity="2"] .msg-row.right .bubble[data-emotion="confused"].show{
+  animation:bubble-pop-right var(--bubble-duration) var(--bubble-easing) both,
+            l2-tilt 1.4s ease-in-out var(--bubble-duration) 2 !important;
+}
+
+@keyframes l2-beat{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.04)}
+}
+@keyframes l2-heartbeat{
+  0%,70%,100%{transform:scale(1)}
+  15%{transform:scale(1.06)}
+  30%{transform:scale(1)}
+  45%{transform:scale(1.05)}
+}
+@keyframes l2-tremor{
+  0%,100%{transform:translate(0,0)}
+  50%{transform:translate(1px,-1px)}
+}
+@keyframes l2-droop{
+  0%,100%{transform:translateY(0) rotate(0deg)}
+  50%{transform:translateY(2px) rotate(-1deg)}
+}
+@keyframes l2-sway{
+  0%,100%{transform:rotate(0deg)}
+  50%{transform:rotate(1.5deg)}
+}
+@keyframes l2-tilt{
+  0%,100%{transform:rotate(0deg)}
+  33%{transform:rotate(-2deg)}
+  66%{transform:rotate(2deg)}
+}
+
+/* ---- L3 中度：反应式（L2 基础 + 气泡放大、光晕、对头像/他人产生外溢响应）---- */
+[data-intensity="3"] .bubble[data-emotion="excited"].show{
+  animation:bubble-pop-left var(--bubble-duration) var(--bubble-easing) both,
+            l3-pulse-joy 0.8s ease-in-out var(--bubble-duration) 3 !important;
+}
+[data-intensity="3"] .msg-row.right .bubble[data-emotion="excited"].show{
+  animation:bubble-pop-right var(--bubble-duration) var(--bubble-easing) both,
+            l3-pulse-joy 0.8s ease-in-out var(--bubble-duration) 3 !important;
+}
+[data-intensity="3"] .bubble[data-emotion="angry"].show,
+[data-intensity="3"] .msg-row.right .bubble[data-emotion="angry"].show{
+  animation:bubble-pop-left var(--bubble-duration) var(--bubble-easing) both,
+            shake var(--shake-duration) ease var(--bubble-duration),
+            l3-rage-glow 0.7s ease-in-out var(--bubble-duration) 2 !important;
+}
+[data-intensity="3"] .bubble[data-emotion="love"].show,
+[data-intensity="3"] .msg-row.right .bubble[data-emotion="love"].show{
+  animation:bubble-pop-left var(--bubble-duration) var(--bubble-easing) both,
+            l3-love-glow 1.2s ease-in-out var(--bubble-duration) 3 !important;
+}
+[data-intensity="3"] .msg-row.right .bubble[data-emotion="love"].show{
+  animation-name:bubble-pop-right, l3-love-glow !important;
+}
+[data-intensity="3"] .bubble[data-emotion="sad"].show,
+[data-intensity="3"] .msg-row.right .bubble[data-emotion="sad"].show{
+  animation:bubble-pop-left var(--bubble-duration) var(--bubble-easing) both,
+            l3-sad-heavy 1.8s ease-in-out var(--bubble-duration) 2 !important;
+}
+[data-intensity="3"] .msg-row.right .bubble[data-emotion="sad"].show{
+  animation-name:bubble-pop-right, l3-sad-heavy !important;
+}
+[data-intensity="3"] .bubble[data-emotion="sleepy"].show,
+[data-intensity="3"] .msg-row.right .bubble[data-emotion="sleepy"].show{
+  animation:bubble-pop-left var(--bubble-duration) var(--bubble-easing) both,
+            l3-sleepy-drift 2.2s ease-in-out var(--bubble-duration) 2 !important;
+}
+[data-intensity="3"] .msg-row.right .bubble[data-emotion="sleepy"].show{
+  animation-name:bubble-pop-right, l3-sleepy-drift !important;
+}
+[data-intensity="3"] .bubble[data-emotion="confused"].show,
+[data-intensity="3"] .msg-row.right .bubble[data-emotion="confused"].show{
+  animation:bubble-pop-left var(--bubble-duration) var(--bubble-easing) both,
+            l3-confused-wobble 1.4s ease-in-out var(--bubble-duration) 3 !important;
+}
+[data-intensity="3"] .msg-row.right .bubble[data-emotion="confused"].show{
+  animation-name:bubble-pop-right, l3-confused-wobble !important;
+}
+/* L3 同步驱动头像微反应（兴奋/喜欢时头像跟着动，愤怒时人不动）*/
+[data-intensity="3"] .msg-row:has(.bubble[data-emotion="excited"].show) .avatar-character{
+  animation:l3-avatar-hop 0.8s ease-in-out 0.3s 2 !important;
+}
+[data-intensity="3"] .msg-row:has(.bubble[data-emotion="love"].show) .avatar-character{
+  animation:l3-avatar-hug 1.2s ease-in-out 0.3s 2 !important;
+}
+
+@keyframes l3-pulse-joy{
+  0%,100%{transform:scale(1);filter:brightness(1)}
+  50%{transform:scale(1.08) rotate(-1deg);filter:brightness(1.08)}
+}
+@keyframes l3-rage-glow{
+  0%,100%{transform:scale(1);filter:drop-shadow(0 0 0 rgba(255,80,80,0))}
+  50%{transform:scale(1.05);filter:drop-shadow(0 0 8px rgba(255,80,80,.5))}
+}
+@keyframes l3-love-glow{
+  0%,100%{transform:scale(1);filter:drop-shadow(0 0 0 rgba(255,105,180,0))}
+  50%{transform:scale(1.05);filter:drop-shadow(0 0 10px rgba(255,105,180,.55))}
+}
+@keyframes l3-sad-heavy{
+  0%,100%{transform:translateY(0) scale(1);filter:saturate(1)}
+  50%{transform:translateY(3px) scale(.98);filter:saturate(.7) brightness(.95)}
+}
+@keyframes l3-sleepy-drift{
+  0%,100%{transform:translateY(0) rotate(0deg);opacity:1}
+  50%{transform:translateY(2px) rotate(2deg);opacity:.85}
+}
+@keyframes l3-confused-wobble{
+  0%,100%{transform:rotate(0deg)}
+  25%{transform:rotate(-3deg)}
+  75%{transform:rotate(3deg)}
+}
+@keyframes l3-avatar-hop{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-6px)}
+}
+@keyframes l3-avatar-shake{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-3px)}
+  75%{transform:translateX(3px)}
+}
+@keyframes l3-avatar-hug{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.06) rotate(-3deg)}
+}
+
+/* ---- L4 强烈：接入现有「对话角力」王者效果 + 其他情绪也有强烈响应 ---- */
+/* L4 下，任何有情绪的气泡都在短时间内变成"主角"（放大、光晕）；动画播完后自动回到原始态 */
+[data-intensity="4"][data-demo="game"] .msg-row.angry-king{z-index:20}
+[data-intensity="4"] .bubble[data-emotion="excited"].show,
+[data-intensity="4"] .msg-row.right .bubble[data-emotion="excited"].show{
+  animation:bubble-pop-left var(--bubble-duration) var(--bubble-easing) both,
+            l4-dominant 1.2s cubic-bezier(.34,1.56,.64,1) var(--bubble-duration) !important;
+  transform-origin:left center;
+}
+[data-intensity="4"] .msg-row.right .bubble[data-emotion="excited"].show{
+  animation-name:bubble-pop-right, l4-dominant-right !important;
+  transform-origin:right center;
+}
+[data-intensity="4"] .bubble[data-emotion="love"].show{
+  animation:bubble-pop-left var(--bubble-duration) var(--bubble-easing) both,
+            l4-love-blast 1.2s cubic-bezier(.34,1.56,.64,1) var(--bubble-duration) !important;
+  transform-origin:left center;
+}
+[data-intensity="4"] .msg-row.right .bubble[data-emotion="love"].show{
+  animation:bubble-pop-right var(--bubble-duration) var(--bubble-easing) both,
+            l4-love-blast-right 1.2s cubic-bezier(.34,1.56,.64,1) var(--bubble-duration) !important;
+  transform-origin:right center;
+}
+[data-intensity="4"] .bubble[data-emotion="sad"].show{
+  animation:bubble-pop-left var(--bubble-duration) var(--bubble-easing) both,
+            l4-sad-break 1.5s cubic-bezier(.4,0,.2,1) var(--bubble-duration) !important;
+  transform-origin:left center;
+}
+[data-intensity="4"] .msg-row.right .bubble[data-emotion="sad"].show{
+  animation:bubble-pop-right var(--bubble-duration) var(--bubble-easing) both,
+            l4-sad-break-right 1.5s cubic-bezier(.4,0,.2,1) var(--bubble-duration) !important;
+  transform-origin:right center;
+}
+[data-intensity="4"] .bubble[data-emotion="confused"].show{
+  animation:bubble-pop-left var(--bubble-duration) var(--bubble-easing) both,
+            l4-confused-storm 1.4s ease-in-out var(--bubble-duration) !important;
+  transform-origin:left center;
+}
+[data-intensity="4"] .msg-row.right .bubble[data-emotion="confused"].show{
+  animation:bubble-pop-right var(--bubble-duration) var(--bubble-easing) both,
+            l4-confused-storm-right 1.4s ease-in-out var(--bubble-duration) !important;
+  transform-origin:right center;
+}
+[data-intensity="4"] .bubble[data-emotion="sleepy"].show{
+  animation:bubble-pop-left var(--bubble-duration) var(--bubble-easing) both,
+            l4-sleepy-fade 1.8s ease-in-out var(--bubble-duration) !important;
+  transform-origin:left center;
+}
+[data-intensity="4"] .msg-row.right .bubble[data-emotion="sleepy"].show{
+  animation:bubble-pop-right var(--bubble-duration) var(--bubble-easing) both,
+            l4-sleepy-fade 1.8s ease-in-out var(--bubble-duration) !important;
+  transform-origin:right center;
+}
+
+/* L4 keyframes —— 高潮在中段，100% 回到原始态（不保留放大/滤镜）*/
+@keyframes l4-dominant{
+  0%{transform:scale(1);filter:none}
+  40%{transform:scale(1.18);filter:drop-shadow(0 0 10px rgba(255,200,80,.6)) drop-shadow(0 0 20px rgba(255,200,80,.3))}
+  70%{transform:scale(1.1);filter:drop-shadow(0 0 6px rgba(255,200,80,.4))}
+  100%{transform:scale(1);filter:none}
+}
+@keyframes l4-dominant-right{
+  0%{transform:scale(1);filter:none}
+  40%{transform:scale(1.18);filter:drop-shadow(0 0 10px rgba(255,200,80,.6)) drop-shadow(0 0 20px rgba(255,200,80,.3))}
+  70%{transform:scale(1.1);filter:drop-shadow(0 0 6px rgba(255,200,80,.4))}
+  100%{transform:scale(1);filter:none}
+}
+@keyframes l4-love-blast{
+  0%{transform:scale(1);filter:none}
+  30%{transform:scale(1.22) rotate(-3deg);filter:drop-shadow(0 0 12px rgba(255,105,180,.7))}
+  60%{transform:scale(1.12) rotate(0deg);filter:drop-shadow(0 0 8px rgba(255,105,180,.4))}
+  100%{transform:scale(1) rotate(0deg);filter:none}
+}
+@keyframes l4-love-blast-right{
+  0%{transform:scale(1);filter:none}
+  30%{transform:scale(1.22) rotate(3deg);filter:drop-shadow(0 0 12px rgba(255,105,180,.7))}
+  60%{transform:scale(1.12) rotate(0deg);filter:drop-shadow(0 0 8px rgba(255,105,180,.4))}
+  100%{transform:scale(1) rotate(0deg);filter:none}
+}
+@keyframes l4-sad-break{
+  0%{transform:scale(1) translateY(0) rotate(0);filter:saturate(1)}
+  50%{transform:scale(.94) translateY(6px) rotate(-2deg);filter:saturate(.4) brightness(.88) drop-shadow(0 0 10px rgba(89,147,255,.35))}
+  80%{transform:scale(.97) translateY(3px) rotate(-1deg);filter:saturate(.7) brightness(.94)}
+  100%{transform:scale(1) translateY(0) rotate(0);filter:saturate(1) brightness(1)}
+}
+@keyframes l4-sad-break-right{
+  0%{transform:scale(1) translateY(0) rotate(0);filter:saturate(1)}
+  50%{transform:scale(.94) translateY(6px) rotate(2deg);filter:saturate(.4) brightness(.88) drop-shadow(0 0 10px rgba(89,147,255,.35))}
+  80%{transform:scale(.97) translateY(3px) rotate(1deg);filter:saturate(.7) brightness(.94)}
+  100%{transform:scale(1) translateY(0) rotate(0);filter:saturate(1) brightness(1)}
+}
+@keyframes l4-confused-storm{
+  0%{transform:rotate(0) scale(1);filter:none}
+  20%{transform:rotate(-5deg) scale(1.04)}
+  40%{transform:rotate(5deg) scale(1.06);filter:drop-shadow(0 0 6px rgba(138,91,255,.4))}
+  60%{transform:rotate(-3deg) scale(1.05)}
+  80%{transform:rotate(3deg) scale(1.03)}
+  100%{transform:rotate(0) scale(1);filter:none}
+}
+@keyframes l4-confused-storm-right{
+  0%{transform:rotate(0) scale(1);filter:none}
+  20%{transform:rotate(5deg) scale(1.04)}
+  40%{transform:rotate(-5deg) scale(1.06);filter:drop-shadow(0 0 6px rgba(138,91,255,.4))}
+  60%{transform:rotate(3deg) scale(1.05)}
+  80%{transform:rotate(-3deg) scale(1.03)}
+  100%{transform:rotate(0) scale(1);filter:none}
+}
+@keyframes l4-sleepy-fade{
+  0%{transform:scale(1) translateY(0);opacity:1;filter:none}
+  50%{transform:scale(.95) translateY(4px);opacity:.8;filter:blur(.3px) brightness(.95)}
+  100%{transform:scale(1) translateY(0);opacity:1;filter:none}
+}
+/* L4 下仅「愤怒」会压制其他气泡（走原有的 angry-king 逻辑），其他情绪不影响他人 */
+
+
 /* ============ TYPING CURSOR (隐藏) ============ */
 .typing-cursor{display:none!important}
 
@@ -847,7 +1135,8 @@ body{
   display:flex;
 }
 .bubble-style-popup .style-toggle,
-.bubble-style-popup .demo-mode-toggle{
+.bubble-style-popup .demo-mode-toggle,
+.bubble-style-popup .intensity-toggle{
   pointer-events:auto;
   box-shadow:0 4px 16px rgba(0,0,0,.12);
   background:rgba(255,255,255,.95);
@@ -866,6 +1155,18 @@ body{
   background:linear-gradient(135deg,#6B5BFF 0%,#8B5CF6 100%);
   color:#fff;
   box-shadow:0 2px 8px rgba(107,91,255,.4);
+}
+/* 动画强度切换器 */
+.intensity-toggle button{
+  padding:6px 12px;border:none;cursor:pointer;
+  font-size:11px;font-weight:600;font-family:var(--font);
+  color:var(--text-secondary);background:transparent;
+  border-radius:8px;transition:all .25s;
+}
+.intensity-toggle button.active{
+  background:linear-gradient(135deg,#FF6B9D 0%,#FF5B5B 100%);
+  color:#fff;
+  box-shadow:0 2px 8px rgba(255,91,91,.4);
 }
 
 /* ============ 游戏化 Demo ============ */
@@ -1130,8 +1431,10 @@ body{
   display:flex;flex-direction:column;
 }
 .avatar-sheet.show{transform:translateY(0)}
-/* 非"我的"半屏：去掉底部工具栏，整体高度减去工具栏高度（约 87px）*/
-.avatar-sheet[data-self="false"]{height:calc(66% - 87px)}
+/* 非"我的"半屏：去掉底部工具栏，整体高度减去工具栏高度（约 87px），再上移 20px */
+.avatar-sheet[data-self="false"]{height:calc(66% - 107px)}
+/* 非"我的"半屏：body 底部增加安全间距，防止形象贴底 */
+.avatar-sheet[data-self="false"] .avatar-sheet-body{padding-bottom:32px}
 
 .avatar-sheet-header{
   display:flex;align-items:center;justify-content:center;
@@ -1428,6 +1731,12 @@ body{
         <button data-bubble="B">漫画气泡</button>
         <button data-bubble="C" class="active">简约气泡</button>
         <button data-bubble="D">泡泡气泡</button>
+      </div>
+      <div class="intensity-toggle" id="intensityToggle">
+        <button data-intensity="1" class="active">极轻</button>
+        <button data-intensity="2">轻度</button>
+        <button data-intensity="3">中度</button>
+        <button data-intensity="4">强烈</button>
       </div>
     </div>
     <div class="empty-state" id="emptyState">
@@ -3628,6 +3937,21 @@ window.addEventListener('unhandledrejection', function(e) {
         });
         if (window.GameMode) GameMode.activeFaction = null;
       }
+      setTimeout(() => popup.classList.remove('show'), 300);
+    });
+  }
+
+  /* 动画强度切换（1-4 档）*/
+  document.body.setAttribute('data-intensity', '1');
+  const intensityToggle = document.getElementById('intensityToggle');
+  if (intensityToggle) {
+    intensityToggle.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-intensity]');
+      if (!btn) return;
+      e.stopPropagation();
+      document.body.setAttribute('data-intensity', btn.dataset.intensity);
+      intensityToggle.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
       setTimeout(() => popup.classList.remove('show'), 300);
     });
   }
