@@ -721,28 +721,18 @@ body{
 .sad-marks{display:none;position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;overflow:visible}
 .bubble[data-emotion="sad"].show .sad-marks{display:block}
 .sad-mark{position:absolute;opacity:0}
-/* 双泪滴（主） —— 气泡右上角外侧，按 Figma: left:106, top:-8（气泡宽 109，突出约 -3px）*/
+/* 泪滴 —— 气泡右上角外侧 (Figma: left:106, top:-8) */
 .sad-mark.sad-1{animation:sad-pop 0.6s ease-out 0s forwards, sad-fly 2.2s ease-out 0.6s infinite}
 .msg-row.left .sad-mark.sad-1{top:-8px;right:-3px}
 .msg-row.right .sad-mark.sad-1{top:-8px;left:-3px}
 .sad-mark.sad-1 img{width:14px;height:18px;display:block}
 .msg-row.right .sad-mark.sad-1 img{transform:scaleX(-1)}
-/* 小泪滴（辅） —— 紧邻主泪滴右上方，几乎贴在一起 */
-.sad-mark.sad-2{animation:sad-pop 0.6s ease-out 0.2s forwards, sad-fly-small 2.4s ease-out 0.8s infinite}
-.msg-row.left .sad-mark.sad-2{top:-12px;right:-10px}
-.msg-row.right .sad-mark.sad-2{top:-12px;left:-10px}
-.sad-mark.sad-2 img{width:11px;height:11px;display:block}
-.msg-row.right .sad-mark.sad-2 img{transform:scaleX(-1)}
 /* 泡泡气泡(D) 难过粒子位置补偿 */
 [data-bubble="D"] .msg-row.left .sad-mark.sad-1{right:1px}
 [data-bubble="D"] .msg-row.right .sad-mark.sad-1{left:1px}
-[data-bubble="D"] .msg-row.left .sad-mark.sad-2{right:-6px}
-[data-bubble="D"] .msg-row.right .sad-mark.sad-2{left:-6px}
 /* 普通气泡(A) 难过粒子位置补偿（整体往形象方向偏移，贴合气泡）*/
 [data-bubble="A"] .msg-row.left .sad-mark.sad-1{right:-11px}
 [data-bubble="A"] .msg-row.right .sad-mark.sad-1{left:-11px}
-[data-bubble="A"] .msg-row.left .sad-mark.sad-2{right:-18px}
-[data-bubble="A"] .msg-row.right .sad-mark.sad-2{left:-18px}
 @keyframes sad-pop{
   0%{opacity:0;transform:scale(0.3) translate(0,-6px)}
   60%{opacity:1;transform:scale(1.15) translate(0,2px)}
@@ -755,23 +745,12 @@ body{
   100%{opacity:0;transform:translate(7px,-10px) scale(0.7) rotate(18deg)}
 }
 /* 小泪滴飞散（幅度略大一点点） */
-@keyframes sad-fly-small{
-  0%{opacity:1;transform:translate(0,0) scale(1) rotate(0deg)}
-  60%{opacity:1;transform:translate(5px,-7px) scale(0.9) rotate(14deg)}
-  100%{opacity:0;transform:translate(9px,-12px) scale(0.6) rotate(22deg)}
-}
 /* 右侧消息镜像飞行方向（飞向左上）*/
 .msg-row.right .sad-mark.sad-1{animation:sad-pop 0.6s ease-out 0s forwards, sad-fly-right 2.2s ease-out 0.6s infinite}
-.msg-row.right .sad-mark.sad-2{animation:sad-pop 0.6s ease-out 0.2s forwards, sad-fly-small-right 2.4s ease-out 0.8s infinite}
 @keyframes sad-fly-right{
   0%{opacity:1;transform:translate(0,0) scale(1) rotate(0deg)}
   60%{opacity:1;transform:translate(-4px,-6px) scale(0.95) rotate(-10deg)}
   100%{opacity:0;transform:translate(-7px,-10px) scale(0.7) rotate(-18deg)}
-}
-@keyframes sad-fly-small-right{
-  0%{opacity:1;transform:translate(0,0) scale(1) rotate(0deg)}
-  60%{opacity:1;transform:translate(-5px,-7px) scale(0.9) rotate(-14deg)}
-  100%{opacity:0;transform:translate(-9px,-12px) scale(0.6) rotate(-22deg)}
 }
 /* 气泡轻微下垂（像哭泣时的叹息）*/
 @keyframes sad-droop{
@@ -1146,11 +1125,13 @@ body{
   border-radius:24px 24px 0 0;
   box-shadow:0 -4px 12px rgba(0,0,0,.05);
   transform:translateY(100%);
-  transition:transform .35s cubic-bezier(.4,0,.2,1);
+  transition:transform .35s cubic-bezier(.4,0,.2,1), height .35s cubic-bezier(.4,0,.2,1);
   overflow:hidden;
   display:flex;flex-direction:column;
 }
 .avatar-sheet.show{transform:translateY(0)}
+/* 非"我的"半屏：去掉底部工具栏，整体高度减去工具栏高度（约 87px）*/
+.avatar-sheet[data-self="false"]{height:calc(66% - 87px)}
 
 .avatar-sheet-header{
   display:flex;align-items:center;justify-content:center;
@@ -1236,21 +1217,21 @@ body{
   border-image-source:url('bubbleB-right.png');
   border-image-slice:75 120 36 84 fill;
   border-image-width:25px 40px 12px 28px;
-  padding:6px 31px 6px 8px;
+  padding:6px 22px 6px 12px;
 }
 /* 气泡C样式 - 尖角朝右 */
 [data-bubble="C"] .os-bubble{
   border-image-source:url('bubbleC-right.png');
   border-image-slice:63 84 66 66 fill;
   border-image-width:21px 28px 22px 22px;
-  padding:6px 25px 6px 6px;
+  padding:6px 16px 6px 10px;
 }
 /* 气泡D样式 - 尖角朝右 */
 [data-bubble="D"] .os-bubble{
   border-image-source:url('bubbleD-right.png');
   border-image-slice:78 116 66 66 fill;
   border-image-width:26px 38px 22px 22px;
-  padding:6px 27px 6px 8px;
+  padding:6px 18px 6px 12px;
 }
 
 /* 底部工具栏 */
@@ -1261,6 +1242,8 @@ body{
   position:relative;
   transform:translateY(-20px);
 }
+/* 非"我的"半屏：隐藏底部工具栏胶囊 */
+.avatar-sheet:not([data-self="true"]) .avatar-sheet-toolbar{display:none}
 .avatar-sheet-toolbar-inner{
   display:flex;align-items:center;justify-content:center;
   background:rgba(255,255,255,.9);
@@ -1286,7 +1269,7 @@ body{
 
 /* ============ 我的编辑页 ============ */
 .self-editor{
-  position:absolute;inset:0;z-index:5;
+  position:absolute;inset:0;z-index:20;
   background:#F5F6FA;
   display:flex;flex-direction:column;
   transform:translateX(100%);
@@ -1741,6 +1724,7 @@ window.addEventListener('unhandledrejection', function(e) {
       hasAvatar: true,
       side: 'left',
       personality: 'cool-guy',
+      slogan: '风大 别裹紧自己',
       voice: { voiceName: 'zh-CN-YunyangNeural', rate: '+0%', pitch: '+0Hz' },
       responses: {
         excited: [
@@ -1801,6 +1785,7 @@ window.addEventListener('unhandledrejection', function(e) {
       hasAvatar: false,
       side: 'left',
       personality: 'chill',
+      slogan: '躺平派 人生导师',
       voice: null,
       responses: {
         excited: [
@@ -1859,6 +1844,7 @@ window.addEventListener('unhandledrejection', function(e) {
       hasAvatar: false,
       side: 'left',
       personality: 'bubbly',
+      slogan: '快乐小狗上线啦~',
       voice: null,
       responses: {
         excited: [
@@ -1916,6 +1902,7 @@ window.addEventListener('unhandledrejection', function(e) {
       hasAvatar: true,
       side: 'left',
       personality: 'cool',
+      slogan: '温柔是我的武器',
       voice: { voiceName: 'zh-CN-XiaoyiNeural', rate: '+0%', pitch: '+2Hz' },
       responses: {
         excited: [
@@ -1976,6 +1963,7 @@ window.addEventListener('unhandledrejection', function(e) {
       hasAvatar: true,
       side: 'left',
       personality: 'sweet',
+      slogan: '要做你最甜的小饼干♡',
       voice: { voiceName: 'zh-CN-XiaoxiaoNeural', rate: '+5%', pitch: '+3Hz' },
       responses: {
         excited: [
@@ -2744,7 +2732,7 @@ window.addEventListener('unhandledrejection', function(e) {
     } else if (emotion === 'sleepy') {
       sleepyHTML = '<div class="sleepy-marks"><span class="sleepy-mark z-1"></span><span class="sleepy-mark z-2"></span><span class="sleepy-mark z-3"></span></div>';
     } else if (emotion === 'sad') {
-      sadHTML = '<div class="sad-marks"><span class="sad-mark sad-1"><img src="眼泪2.svg" alt=""></span><span class="sad-mark sad-2"><img src="眼泪1.svg" alt=""></span></div>';
+      sadHTML = '<div class="sad-marks"><span class="sad-mark sad-1"><img src="泪滴.svg" alt=""></span></div>';
     }
 
     const nameAlign = side === 'right' ? 'text-align:right' : '';
@@ -3266,12 +3254,11 @@ window.addEventListener('unhandledrejection', function(e) {
     ],
   };
 
-  /* 根据最近聊天内容和角色性格生成 OS */
+  /* 根据成员的 slogan 或性格模板生成 OS */
   function generateOS(member) {
-    /* 我的：使用自定义 slogan（无括号，直接展示为人设签名） */
-    if (member === SELF) {
-      return member.slogan || '做最真实的自己';
-    }
+    /* 优先使用人设 slogan（所有成员统一为 slogan 风格）*/
+    if (member.slogan) return member.slogan;
+    if (member === SELF) return '做最真实的自己';
     const pool = OS_TEMPLATES[member.personality] || OS_TEMPLATES['chill'];
     return pool[Math.floor(Math.random() * pool.length)];
   }
@@ -3298,6 +3285,8 @@ window.addEventListener('unhandledrejection', function(e) {
     avatarSheetImg.src = member.avatar;
     avatarSheetImg.alt = member.name;
     avatarSheetTitle.textContent = (member === SELF) ? '我的QQ秀' : member.name + '的QQ秀';
+    /* 标记当前是否为我的半屏，用于控制底部工具栏显隐 */
+    avatarSheet.setAttribute('data-self', member === SELF ? 'true' : 'false');
     osText.textContent = '';
     avatarSheet.classList.add('show');
     avatarSheetOverlay.classList.add('show');
@@ -3355,10 +3344,17 @@ window.addEventListener('unhandledrejection', function(e) {
   avatarSheetClose.addEventListener('click', closeAvatarSheet);
   avatarSheetOverlay.addEventListener('click', closeAvatarSheet);
 
-  /* 点击 OS 气泡播放语音（适用于所有成员，尤其是我的——打开不自动播，点击才播放）*/
+  /* 点击 OS 气泡：
+   * - 我的：打开编辑页（编辑 slogan / 音色）
+   * - 其他成员：播放内心独白语音（whisper）
+   */
   osBubble.addEventListener('click', (e) => {
     e.stopPropagation();
     if (!currentSheetMember) return;
+    if (currentSheetMember === SELF) {
+      openSelfEditor();
+      return;
+    }
     const content = osBubble.dataset.osContent || osText.textContent;
     if (!content) return;
     playOsVoice(content, currentSheetMember);
